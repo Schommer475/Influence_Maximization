@@ -5,8 +5,10 @@ Created on Tue Mar 13 21:39:24 2018
 
 @author: abhishek.umrawal
 """
-from independent_cascade import independent_cascade
-from linear_threshold import linear_threshold
+from Utilities.independent_cascade import independent_cascade
+from Utilities.linear_threshold import linear_threshold
+from Utilities.global_names import resources, facebook_network, communities
+from os.path import join as join_path
 import networkx as nx
 import numpy as np
 from tqdm import tqdm
@@ -43,11 +45,13 @@ if __name__ == '__main__':
     """READING/INTIALIZING THE NETWORK"""
     """Working with the Facebook network """
     "Reading the Facebook network from file"
-    network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+    facebook_path = join_path(resources,facebook_network)
+    network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
     "Reading communities"
     filename = 'communities.pkl'
-    with open(filename, 'rb') as f:
+    communities_path = join_path(resources,communities)
+    with open(communities_path, 'rb') as f:
         part = pickle.load(f)
     value = [part.get(node) for node in network.nodes()]
     nodes_subset = [key for key,value in part.items() if value == 4]
