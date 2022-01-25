@@ -23,34 +23,8 @@ import copy
 import networkx as nx
 import re
 import pickle
-
-import sys
-sys.path.append('./TIMLinUCB')
-
-def weighted_network(network, method):
-    
-    if (method == "rn"):
-        for edge in network.edges():
-            network[edge[0]][edge[1]]['prob'] = np.random.rand(1)[0]
-
-    elif (method == "tv"):
-        TV = [.1,.01,.001]
-        for edge in network.edges():
-            network[edge[0]][edge[1]]['prob'] = np.random.choice(TV)
-            
-    elif (method == "wc"):
-      
-      edge_list = pd.DataFrame(list(network.edges)) 
-      edge_list.columns = ['from','to']
-      in_degree = pd.DataFrame(list(network.in_degree))
-      in_degree.columns = ['to','in_degree']
-      edge_list = edge_list.merge(in_degree)
-      edge_list['prob'] = 1./edge_list['in_degree']
-      
-      for i in range(len(edge_list)):
-             network[edge_list['from'][i]][edge_list['to'][i]]['prob'] = edge_list['prob'][i]
-      
-    return network
+from Utilities.weighted_network import weighted_network
+from Utilities.global_names import resources, facebook_network, communities, node2vec
 
 def get_features_nodes(
     graph,
@@ -498,11 +472,13 @@ if __name__ == '__main__':
     """READING/INTIALIZING THE NETWORK"""
     """Working with the Facebook network """
     "Reading the Facebook network from file"
-    network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+    
+    facebook_path = os.path.join(resources, facebook_network)
+    network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
     "Reading communities"
-    filename = 'communities.pkl'
-    with open(filename, 'rb') as f:
+    communities_path = os.path.join(resources, communities)
+    with open(communities_path, 'rb') as f:
         part = pickle.load(f)
     value = [part.get(node) for node in network.nodes()]
     nodes_subset = [key for key,value in part.items() if value == 4]
@@ -525,7 +501,8 @@ if __name__ == '__main__':
     
     network = weighted_network(network, method='wc')
     
-    df_feats = generate_node2vec_fetures(network, dataset_name = "facebook", node2vec_path = "node2vec.exe")
+    node_path = os.path.join(resources, node2vec)
+    df_feats = generate_node2vec_fetures(network, dataset_name = "facebook", node2vec_path = node_path)
     
     #oracle = tim(df, len(network.edges()), len(df), 5, 0.4)
     dic = imlinucb_node2vec(G=network, df_feats=df_feats, num_inf=5, num_repeats=10)

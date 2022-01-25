@@ -7,7 +7,7 @@ Created on Sat May 18 02:23:56 2019
 """
 
 "Importing necessary modules"
-from influence import influence
+from Utilities.influence import influence
 #from true_influence import true_influence
 import numpy as np
 import time as time

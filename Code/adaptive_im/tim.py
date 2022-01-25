@@ -14,6 +14,8 @@ import operator
 from scipy.special import comb
 import pickle
 from tqdm import tqdm
+import os
+from Utilities.global_names import resources, facebook_network, communities
 
 # Set l to reach confidence level 1-1/n
 l = 1
@@ -133,11 +135,12 @@ def NodeSelection(G, k):
     return(Sk_p)
     
 if __name__ == '__main__':
-    network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+    facebook_path = os.path.join(resources, facebook_network)
+    network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
     "Reading communities"
-    filename = 'communities.pkl'
-    with open(filename, 'rb') as f:
+    communities_path = os.path.join(resources, communities)
+    with open(communities_path, 'rb') as f:
         part = pickle.load(f)
         
     value = [part.get(node) for node in network.nodes()]

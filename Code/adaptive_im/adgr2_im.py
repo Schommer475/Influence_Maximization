@@ -8,20 +8,22 @@ Created on Sat May 18 02:23:56 2019
 """
 
 "Importing necessary modules"
-from influence import influence
+from Utilities.influence import influence
 import numpy as np
 import os as os; os.getcwd()
 import random
 from collections import defaultdict 
 import operator
+import networkx as nx
+from weighted_network import weighted_network
 
 def adgr2_im(network, seed_set_size, diffusion_model, num_times, num_samples, epsilon):
     
-    import networkx as nx
+    
     network = nx.karate_club_graph()
     network = network.to_directed()
     network = nx.convert_node_labels_to_integers(network,first_label=1)
-    from weighted_network import weighted_network
+    
     network = weighted_network(network,'wc')  
     seed_set_size = 4
     diffusion_model = 'independent_cascade'

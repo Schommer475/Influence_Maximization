@@ -7,7 +7,7 @@ Created on Sat May 18 02:23:56 2019
 """
 
 "Importing necessary modules"
-from influence import influence
+from Utilities.influence import influence
 import numpy as np
 import os as os; os.getcwd()
 import random

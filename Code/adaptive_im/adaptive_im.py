@@ -15,18 +15,15 @@ Created on Fri Feb 15 19:17:14 2019
 """
 
 "Importing necessary modules"
-from weighted_network import weighted_network
-from adgr1_im import adgr1_im
-#from adgr2_im import adgr2_im
-from ucbgr_im import ucbgr_im
-import IMLinUCB
-from dart_im import dart_im
-from cmab_im import cmab_im
-#from csar_im import csar_im
-from ecd1_im import ecd1_im
-from ecd2_im import ecd2_im
-from ucb_im import ucb_im
-from rand_im import rand_im
+from Utilities.weighted_network import weighted_network
+from adaptive_im.adgr1_im import adgr1_im
+#from adaptive_im.adgr2_im import adgr2_im
+from adaptive_im.ucbgr_im import ucbgr_im
+import adaptive_im.IMLinUCB as IMLinUCB
+from adaptive_im.dart_im import dart_im
+from adaptive_im.cmab_im import cmab_im
+from adaptive_im.ucb_im import ucb_im
+from adaptive_im.rand_im import rand_im
 import random
 import pickle
 import networkx as nx
@@ -66,21 +63,12 @@ def adaptive_im(inpt):
     elif (algorithm == "ucbgr"):
         best_seed_sets, obs_influences = ucbgr_im(network,seed_set_size,diffusion_model,num_times,stage_horizon)  
         
-    #elif (algorithm == "csar"):
-        #best_seed_sets, obs_influences = csar_im(network,seed_set_size,diffusion_model,num_times)
-        
     elif (algorithm == "dart"):
         best_seed_sets, obs_influences = dart_im(network,seed_set_size,diffusion_model,num_times)
     
     elif (algorithm == "cmab"):
         best_seed_sets, obs_influences = cmab_im(network,seed_set_size,diffusion_model,num_times)
     
-    elif (algorithm == "ecd1"):
-        best_seed_sets, obs_influences = ecd1_im(network,seed_set_size,epsilon,diffusion_model,num_times)    
-    
-    elif (algorithm == "ecd2"):
-        best_seed_sets, obs_influences = ecd2_im(network,seed_set_size,epsilon,diffusion_model,num_times) 
-        
     elif (algorithm == "ucb"):
         best_seed_sets, obs_influences = ucb_im(network,seed_set_size,diffusion_model,num_times)  
     

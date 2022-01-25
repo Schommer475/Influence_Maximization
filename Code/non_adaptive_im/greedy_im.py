@@ -5,16 +5,20 @@ Created on Mon Mar 12 18:29:52 2018
 
 @author: abhishek.umrawal
 """
-from independent_cascade import independent_cascade
-from linear_threshold import linear_threshold
+from Utilities.independent_cascade import independent_cascade
+from Utilities.linear_threshold import linear_threshold
 import networkx as nx
 import numpy as np
 import random
 import timeit
-from true_influence import true_influence
+from non_adaptive_im.true_influence import true_influence
 from multiprocessing import Pool
 import itertools
-from weighted_network import weighted_network
+from Utilities.weighted_network import weighted_network
+import pickle
+import pandas as pd
+from Utilities.global_names import resources, facebook_network, communities
+import os
 
 def greedy_im(network, budget, diffusion_model, spontaneous_prob = [], n_sim = 10, num_procs = 1):
     
@@ -108,19 +112,17 @@ def greedy_im(network, budget, diffusion_model, spontaneous_prob = [], n_sim = 1
 
 "Testing"
 if __name__ == '__main__':
-    import networkx as nx
-    import pickle
-    import pandas as pd
     
     """----------------------------------"""
     """READING/INTIALIZING THE NETWORK"""
     """Working with the Facebook network """
     "Reading the Facebook network from file"
-    network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+    facebook_path = os.path.join(resources, facebook_network)
+    network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
     "Reading communities"
-    filename = 'communities.pkl'
-    with open(filename, 'rb') as f:
+    communities_path = os.path.join(resources, communities)
+    with open(communities_path, 'rb') as f:
         part = pickle.load(f)
     value = [part.get(node) for node in network.nodes()]
     nodes_subset = [key for key,value in part.items() if value == 4]

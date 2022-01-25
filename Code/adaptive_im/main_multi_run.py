@@ -10,12 +10,12 @@ if __name__ == '__main__':
     import random
     from multiprocessing import Pool
     import itertools
-    from adaptive_im import adaptive_im
-    #from subgraph import subgraph
+    from adaptive_im.adaptive_im import adaptive_im
+    from Utilities.global_names import resources, facebook_network, communities, node2vec
     import networkx as nx
     import pickle
     import timeit
-    import IMLinUCB
+    import adaptive_im.IMLinUCB as IMLinUCB
     import os
     
     "Start time"
@@ -36,11 +36,12 @@ if __name__ == '__main__':
     """READING/INTIALIZING THE NETWORK"""
     """Working with the Facebook network """
     "Reading the Facebook network from file"
-    network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+    facebook_path = os.path.join(resources, facebook_network)
+    network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
     "Reading communities"
-    filename = 'communities.pkl'
-    with open(filename, 'rb') as f:
+    communities_path = os.path.join(resources, communities)
+    with open(communities_path, 'rb') as f:
         part = pickle.load(f)
     value = [part.get(node) for node in network.nodes()]
     nodes_subset = [key for key,value in part.items() if value == 4]
@@ -74,7 +75,8 @@ if __name__ == '__main__':
     epsilons = [1]                             # [0.10, 0.25, 1] #exploration parameter for ecd_im and adgr_im, keep it 1 for adgr_im for now
     name_id = ['_fb4_un']                         # ['_fl','_fb4_new'] # identifier to name the output folder as results_<name_id>
     num_runs = 10                               # 10 # for each algorithm, seed set size, etc. the number of runs
-    df_feats = IMLinUCB.generate_node2vec_fetures(graph=network, dataset_name = "facebook", node2vec_path = "node2vec.exe")
+    node_path = os.path.join(resources,node2vec)
+    df_feats = IMLinUCB.generate_node2vec_fetures(graph=network, dataset_name = "facebook", node2vec_path = node_path)
                                             #inputs for imlinucb
     """----------------------------------"""
     

@@ -7,13 +7,15 @@ Created on Sun Feb 28 16:49:45 2021
 """
 
 "Importing necessary modules"
-from influence import influence
+from Utilities.influence import influence
 import numpy as np
 import os as os; os.getcwd()
 import random
 import copy
 import networkx as nx
-from weighted_network import weighted_network
+from Utilities.weighted_network import weighted_network
+from Utilities.global_names import resources, facebook_network, communities
+import pickle
 
 def ucbgr_im(network, seed_set_size, diffusion_model, num_times, stage_horizon):
         
@@ -97,18 +99,17 @@ def ucbgr_im(network, seed_set_size, diffusion_model, num_times, stage_horizon):
     return best_seed_sets_ucbgr, obs_influences_ucbgr
 
 if __name__ == '__main__':
-    import pickle
-    import pandas as pd
     
     """----------------------------------"""
     """READING/INTIALIZING THE NETWORK"""
     """Working with the Facebook network """
     "Reading the Facebook network from file"
-    network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+    facebook_path = os.path.join(resources, facebook_network)
+    network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
     "Reading communities"
-    filename = 'communities.pkl'
-    with open(filename, 'rb') as f:
+    communities_path = os.path.join(resources, communities)
+    with open(communities_path, 'rb') as f:
         part = pickle.load(f)
     value = [part.get(node) for node in network.nodes()]
     nodes_subset = [key for key,value in part.items() if value == 4]
