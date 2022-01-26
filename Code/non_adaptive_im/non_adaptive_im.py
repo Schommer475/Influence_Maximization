@@ -7,10 +7,10 @@ Created on Tue May 21 21:01:00 2019
 """
 
 "importing necessary modules"
-from weighted_network import weighted_network
-from degree_im import degree_im
-from wdegree_im import wdegree_im
-from greedy_im import greedy_im
+from Utilities.weighted_network import weighted_network
+from non_adaptive_im.degree_im import degree_im
+from non_adaptive_im.wdegree_im import wdegree_im
+from non_adaptive_im.greedy_im import greedy_im
 import pickle
 import os as os; os.getcwd()
 

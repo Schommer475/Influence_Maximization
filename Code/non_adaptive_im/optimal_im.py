@@ -5,8 +5,8 @@ Created on Mon Mar 12 18:29:52 2018
 
 @author: abhishek.umrawal
 """
-from independent_cascade import independent_cascade
-from linear_threshold import linear_threshold
+from Utilities.independent_cascade import independent_cascade
+from Utilities.linear_threshold import linear_threshold
 import networkx as nx
 import numpy as np
 from scipy.special import comb

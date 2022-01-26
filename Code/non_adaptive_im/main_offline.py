@@ -11,6 +11,8 @@ import itertools
 import networkx as nx
 import pickle
 import timeit
+from Utilities.global_names import resources, facebook_network, communities
+import os
 #import random
 
 "importing required user-defined modules"
@@ -24,11 +26,12 @@ num_procs = 1
 
 """working with the Facebook network """
 "reading the Facebook network from file"
-network = nx.read_edgelist("facebook_network.txt",create_using=nx.DiGraph(), nodetype = int)
+facebook_path = os.path.join(resources, facebook_network)
+network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
 
 "reading communities"
-filename = 'communities.pkl'
-with open(filename, 'rb') as f:
+communities_path = os.path.join(resources, communities)
+    with open(communities_path, 'rb') as f:
     part = pickle.load(f)
 value = [part.get(node) for node in network.nodes()]
 nodes_subset = [key for key,value in part.items() if value == 4]
