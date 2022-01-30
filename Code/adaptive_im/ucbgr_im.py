@@ -14,7 +14,7 @@ import random
 import copy
 import networkx as nx
 from Utilities.weighted_network import weighted_network
-from Utilities.global_names import resources, facebook_network, communities
+from Utilities.global_names import resources, facebook_network, communities, adaptive_temp
 import pickle
 
 def ucbgr_im(network, seed_set_size, diffusion_model, num_times, stage_horizon):
@@ -128,8 +128,15 @@ if __name__ == '__main__':
     
     network = weighted_network(network, 'wc')
     
-    output_dir = os.getcwd()
+    output_dir = adaptive_temp
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        
     name_id = '_fb4_ucbgr_16'
+    output_dir = os.path.join(output_dir, "results" + name_id)
+    
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
     
     for i in range(5):
         rand_id = ''
@@ -139,15 +146,15 @@ if __name__ == '__main__':
         best_seed_sets, obs_influences = ucbgr_im(network,16,"independent_cascade",100000,4000)
         
         results = {'rand_id':rand_id, 'best_seed_sets':best_seed_sets,'obs_influences':obs_influences}
-        os.chdir(output_dir)
-        print(os.getcwd())
-        if not os.path.exists('results'+name_id):
-            os.mkdir('results'+name_id)
-        fstr = 'results'+name_id+os.sep+'output_%s.pkl'%(rand_id)
+        
+        fstr = os.path.join(output_dir,'output_%s.pkl'%(rand_id))
         with open(fstr,'wb') as f:
             pickle.dump(results, f)
-        
+     
+    #TODO find out if this is ever used
+    '''
     with open('./results_fb4_ucbgr/output_ucbgr__1.00__16__10__100000__4000__27579598.pkl', 'rb') as f:
         df = pickle.load(f)
+    '''
 
     

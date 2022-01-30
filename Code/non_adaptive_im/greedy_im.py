@@ -17,7 +17,7 @@ import itertools
 from Utilities.weighted_network import weighted_network
 import pickle
 import pandas as pd
-from Utilities.global_names import resources, facebook_network, communities
+from Utilities.global_names import resources, facebook_network, communities, non_adaptive_temp
 import os
 
 def greedy_im(network, budget, diffusion_model, spontaneous_prob = [], n_sim = 10, num_procs = 1):
@@ -141,11 +141,14 @@ if __name__ == '__main__':
     
     network = weighted_network(network, 'wc')
     
-    nx.write_edgelist(network, "facebook.txt", data=["act_prob"])
+    #TODO Find out if this part is necessary
+    fb_output_path = os.path.join(non_adaptive_temp, "facebook.txt")
+    nx.write_edgelist(network, fb_output_path, data=["act_prob"])
     
     x32, y32 = greedy_im(network, 2, 'independent_cascade', num_procs = 1)
     
+    greedy_output_path = os.path.join(non_adaptive_temp, "greedy32.csv")
     data32 = {'best_seed_set':x32, 'max_influence':y32}
     greedy32 = pd.DataFrame.from_dict(data32)
-    greedy32.to_csv('greedy32.csv',index=False,header=True)
+    greedy32.to_csv(greedy_output_path,index=False,header=True)
     

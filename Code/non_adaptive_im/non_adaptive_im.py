@@ -11,6 +11,7 @@ from Utilities.weighted_network import weighted_network
 from non_adaptive_im.degree_im import degree_im
 from non_adaptive_im.wdegree_im import wdegree_im
 from non_adaptive_im.greedy_im import greedy_im
+from Utilities.global_names import non_adaptive_temp
 import pickle
 import os as os; os.getcwd()
 
@@ -35,9 +36,16 @@ def non_adaptive_im(inpt):
                    'best_seed_set':best_seed_set, 'name_id':name_id, 'exp_influence':exp_influence}
         
     #print(os.getcwd())
-    if not os.path.exists('results'+name_id):
-        os.mkdir('results'+name_id)
-    fstr = 'results'+name_id+os.sep+'output_%s__%i__.pkl'%(algorithm,seed_set_size)
+    output_dir = non_adaptive_temp
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        
+    output_dir = os.path.join(output_dir, "results" + name_id)
+    
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        
+    fstr = os.path.join(output_dir,'output_%s__%i__.pkl'%(algorithm,seed_set_size))
     with open(fstr,'wb') as f:
         pickle.dump(results, f)
         

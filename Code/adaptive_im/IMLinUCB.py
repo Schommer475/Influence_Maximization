@@ -24,7 +24,8 @@ import networkx as nx
 import re
 import pickle
 from Utilities.weighted_network import weighted_network
-from Utilities.global_names import resources, facebook_network, communities, node2vec
+from Utilities.global_names import resources, facebook_network, communities, node2vec,\
+ adaptive_temp, adaptive_code
 
 def get_features_nodes(
     graph,
@@ -92,7 +93,7 @@ def get_features_nodes(
     # Preparing to run node2vec
     process = Popen(
         [
-            "node2vec.exe",
+            node2vec_path,
             f"-i:{FNAME_IN}",
             f"-o:{FNAME_OUT}",
             f"-d:{dims}",
@@ -279,10 +280,11 @@ def tim(
     # Preparing to run TIM
     with open(os.path.join(temp_dir, "attribute.txt"), "w+") as f:
         f.write(f"n={num_nodes}\nm={num_edges}")
-
+    #TODO Check about how this works with tim not checking for arguments
+    tim_path = os.path.join(adaptive_code,"tim");
     process = Popen(
         [
-            "./tim",
+            tim_path,
             "-model",
             "IC",
             "-dataset",
@@ -310,7 +312,8 @@ def imlinucb_node2vec(
     num_repeats,
     epsilon=0.4,
     sigma=4,
-    c=0.1
+    c=0.1,
+    tempdir_name="temp_dir"
 ):
     """ Test of the Online IM with Node2Vec features
 
@@ -430,7 +433,7 @@ def imlinucb_node2vec(
                 num_edges_t,
                 num_inf,
                 epsilon,
-                temp_dir="temp_dir" + str(rand)
+                temp_dir=tempdir_name + str(rand)
             )
         )
         #print(s_oracle)
@@ -501,11 +504,14 @@ if __name__ == '__main__':
     
     network = weighted_network(network, method='wc')
     
+    temp_directory = os.path.join(adaptive_temp, "ImLinUCB_temp")
+    
     node_path = os.path.join(resources, node2vec)
-    df_feats = generate_node2vec_fetures(network, dataset_name = "facebook", node2vec_path = node_path)
+    df_feats = generate_node2vec_fetures(network, node2vec_path = node_path, tempdir_name=temp_directory,
+                                         dataset_name = "facebook")
     
     #oracle = tim(df, len(network.edges()), len(df), 5, 0.4)
-    dic = imlinucb_node2vec(G=network, df_feats=df_feats, num_inf=5, num_repeats=10)
+    dic = imlinucb_node2vec(G=network, df_feats=df_feats, num_inf=5, num_repeats=10,tempdir_name=temp_directory)
     
     #print(dic)
     #tim(df, num_nodes, num_edges, num_inf, epsilon)

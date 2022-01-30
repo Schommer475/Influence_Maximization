@@ -14,7 +14,7 @@ import pickle
 from non_adaptive_im.optimal_im import optimal_im
 import numpy as np
 from Utilities.influence import influence
-from Utilities.global_names import resources, facebook_network, communities
+from Utilities.global_names import resources, facebook_network, communities, non_adaptive_temp
  
 name_id = '_fl'
 
@@ -56,6 +56,7 @@ optimal_im_res = {}
 
 if name_id == '_fl':
     try:
+        #TODO find out if this part is still relevant or if I got rid of files I shouldn't have.
         filename = '../exp_influences/results'+name_id+os.sep+'exp_influences_dict.pkl'
         with open(filename, 'rb') as f:
             influence_dict = pickle.load(f)
@@ -73,7 +74,16 @@ if name_id != '_fl':
         optimal_im_res[len(seed_set)] = [seed_set, np.mean([influence(network, seed_set, diffusion_model, spontaneous_prob = []) for i in range(0,10)])]
 
 "Saving the results as a pickle file"
-fstr = 'results'+name_id+os.sep+'optimal_im_res.pkl'
+output_dir = non_adaptive_temp
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
+    
+output_dir = os.path.join(output_dir, "results" + name_id)
+
+if not os.path.exists(output_dir):
+    os.mkdir(output_dir)
+    
+fstr = os.path.join(output_dir,'optimal_im_res.pkl')
 with open(fstr,'wb') as f:
     pickle.dump(optimal_im_res, f)
     

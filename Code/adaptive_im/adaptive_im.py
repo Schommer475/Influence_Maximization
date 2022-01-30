@@ -16,6 +16,7 @@ Created on Fri Feb 15 19:17:14 2019
 
 "Importing necessary modules"
 from Utilities.weighted_network import weighted_network
+from Utilities.global_names import adaptive_temp
 from adaptive_im.adgr1_im import adgr1_im
 #from adaptive_im.adgr2_im import adgr2_im
 from adaptive_im.ucbgr_im import ucbgr_im
@@ -33,11 +34,7 @@ import os; os.getcwd()
 #input_dir = '/scratch/brown/aumrawal/jmlr2020-new/adaptive_im'
 #output_dir = '/home/aumrawal/jmlr2020-new/adaptive_im'
 
-input_dir = os.getcwd()
-output_dir = '/scratch/brown/nieg/'
 
-if not os.path.exists(input_dir):
-    os.mkdir(input_dir)
 
 def adaptive_im(inpt):
     network, weighting_scheme, seed_set_size, epsilon, \
@@ -76,7 +73,9 @@ def adaptive_im(inpt):
         best_seed_sets, obs_influences = rand_im(network,seed_set_size,diffusion_model,num_times)      
     
     elif (algorithm == "imlinucb"):
-        dic = IMLinUCB.imlinucb_node2vec(G=network, df_feats=df_feats, num_inf=seed_set_size, num_repeats=num_times)
+        temp_directory = os.path.join(adaptive_temp, "ImLinUCB_temp")
+        dic = IMLinUCB.imlinucb_node2vec(G=network, df_feats=df_feats, num_inf=seed_set_size, 
+                                         num_repeats=num_times,tempdir_name=temp_directory)
         best_seed_sets = dic["seed_sets"]
         obs_influences = dic["rewards"]
     
@@ -85,11 +84,14 @@ def adaptive_im(inpt):
                'epsilon':epsilon, 'diffusion_model':diffusion_model,'num_times':num_times,'stage_horizon':stage_horizon,\
                'algorithm':algorithm,'rand_id':rand_id, 'best_seed_sets':best_seed_sets,\
                'obs_influences':obs_influences,'num_samples':num_samples}
-    os.chdir(output_dir)
-    print(os.getcwd())
-    if not os.path.exists('results'+name_id):
-        os.mkdir('results'+name_id)
-    fstr = 'results'+name_id+os.sep+'output_%s__%0.2f__%i__%i__%i__%i__%s.pkl'%(algorithm,epsilon,seed_set_size,num_samples,num_times,stage_horizon,rand_id)
+    if not os.path.exists(adaptive_temp):
+        os.mkdir(adaptive_temp)
+        
+    output_dir = os.path.join(adaptive_temp, 'results'+name_id)
+    
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+    fstr = os.path.join(output_dir,'output_%s__%0.2f__%i__%i__%i__%i__%s.pkl'%(algorithm,epsilon,seed_set_size,num_samples,num_times,stage_horizon,rand_id))
     with open(fstr,'wb') as f:
         pickle.dump(results, f)
 

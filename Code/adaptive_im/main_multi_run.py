@@ -11,7 +11,7 @@ if __name__ == '__main__':
     from multiprocessing import Pool
     import itertools
     from adaptive_im.adaptive_im import adaptive_im
-    from Utilities.global_names import resources, facebook_network, communities, node2vec
+    from Utilities.global_names import resources, facebook_network, communities, node2vec, adaptive_temp
     import networkx as nx
     import pickle
     import timeit
@@ -25,9 +25,7 @@ if __name__ == '__main__':
     #input_dir = '/scratch/brown/aumrawal/jmlr2020-new/adaptive_im'
     #output_dir = '/home/aumrawal/jmlr2020-new/adaptive_im'
     
-    input_dir = os.getcwd()
-    print(input_dir)
-    output_dir = '/scratch/brown/nieg/'
+    
     
     "Multiprocessing parameter"
     num_procs = 20
@@ -76,7 +74,9 @@ if __name__ == '__main__':
     name_id = ['_fb4_un']                         # ['_fl','_fb4_new'] # identifier to name the output folder as results_<name_id>
     num_runs = 10                               # 10 # for each algorithm, seed set size, etc. the number of runs
     node_path = os.path.join(resources,node2vec)
-    df_feats = IMLinUCB.generate_node2vec_fetures(graph=network, dataset_name = "facebook", node2vec_path = node_path)
+    temp_directory = os.path.join(adaptive_temp, "ImLinUCB_temp")
+    df_feats = IMLinUCB.generate_node2vec_fetures(graph=network,node2vec_path=node_path, tempdir_name=temp_directory, 
+                                                  dataset_name = "facebook")
                                             #inputs for imlinucb
     """----------------------------------"""
     
