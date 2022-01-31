@@ -37,7 +37,7 @@ def influence(network, seed_set, diffusion_model, spontaneous_prob = []):
 
     return influence
 
-if __name__ == '__main__':
+def main():
     import pickle
     import pandas as pd
     

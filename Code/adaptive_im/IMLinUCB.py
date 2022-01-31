@@ -89,7 +89,7 @@ def get_features_nodes(
         )
     # Saving the edgelist to run node2vec on
     nx.write_edgelist(graph, FNAME_IN)
-    
+    print("before\n")
     # Preparing to run node2vec
     process = Popen(
         [
@@ -470,7 +470,7 @@ def imlinucb_node2vec(
     }
     return return_dict
 
-if __name__ == '__main__':
+def main():
     """----------------------------------"""
     """READING/INTIALIZING THE NETWORK"""
     """Working with the Facebook network """

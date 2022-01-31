@@ -18,12 +18,7 @@ import os
 from Utilities.global_names import resources, facebook_network, communities
 
 # Set l to reach confidence level 1-1/n
-l = 1
 
-epsilon = 0.4
-k = 3
-
-epsilon_prime = 5*((l*epsilon**2)/(k+l))**(1/3)
 
 def GenerateRRSet(G):
     '''
@@ -45,7 +40,7 @@ def GenerateRRSet(G):
     
     return(G.subgraph(RRR))
 
-def KptEstimation(G, k):
+def KptEstimation(G, k, l):
     n = len(G.nodes())
     m = len(G.edges())
     num_iter = math.floor(np.log2(n))-1
@@ -88,7 +83,7 @@ def most_cover(G, R_prime):
         
     return((v, newRR))
     
-def RefineKPT(G, k, kpt, epsilon_prime, R_prime):
+def RefineKPT(G, k, kpt, epsilon_prime, R_prime, l):
     n = len(G.nodes())
     sk = []
     newRR = R_prime
@@ -114,12 +109,12 @@ def RefineKPT(G, k, kpt, epsilon_prime, R_prime):
     kpt_p = f*n/(1+epsilon_prime)
     return(max([kpt_p, kpt]))
     
-def NodeSelection(G, k):
+def NodeSelection(G, k, l, epsilon, epsilon_prime):
     n = len(G.nodes())
     const_lambda = (8+2*epsilon)*n*(l*np.log(n)+np.log(comb(n, k))+np.log(2))*epsilon**(-2)
     
     kpt, R_prime = KptEstimation(G, k)
-    kpt_p = RefineKPT(G, k, kpt, epsilon_prime, R_prime)
+    kpt_p = RefineKPT(G, k, kpt, epsilon_prime, R_prime, l)
     
     theta = const_lambda/kpt_p
     
@@ -134,7 +129,14 @@ def NodeSelection(G, k):
         
     return(Sk_p)
     
-if __name__ == '__main__':
+def main():
+    l = 1
+
+    epsilon = 0.4
+    k = 3
+    
+    epsilon_prime = 5*((l*epsilon**2)/(k+l))**(1/3)
+    
     facebook_path = os.path.join(resources, facebook_network)
     network = nx.read_edgelist(facebook_path,create_using=nx.DiGraph(), nodetype = int)
     
@@ -167,7 +169,10 @@ if __name__ == '__main__':
     
 #    print(GenerateRRSet(G).nodes())
 #    print(G.edges())
-    timp = NodeSelection(network, 5)
+    timp = NodeSelection(network, 5, l, epsilon, epsilon_prime)
+    
+if __name__ == '__main__':
+    main()
     
     
     

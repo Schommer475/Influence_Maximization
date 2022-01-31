@@ -98,7 +98,7 @@ def ucbgr_im(network, seed_set_size, diffusion_model, num_times, stage_horizon):
         
     return best_seed_sets_ucbgr, obs_influences_ucbgr
 
-if __name__ == '__main__':
+def main():
     
     """----------------------------------"""
     """READING/INTIALIZING THE NETWORK"""

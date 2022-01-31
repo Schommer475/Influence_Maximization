@@ -5,18 +5,18 @@ Created on Tue May 21 17:37:20 2019
 
 @author: cjquinn
 """
+import random
+from multiprocessing import Pool
+import itertools
+from adaptive_im.adaptive_im import adaptive_im
+from Utilities.global_names import resources, facebook_network, communities, node2vec, adaptive_temp
+import networkx as nx
+import pickle
+import timeit
+import adaptive_im.IMLinUCB as IMLinUCB
+import os
 
-if __name__ == '__main__':
-    import random
-    from multiprocessing import Pool
-    import itertools
-    from adaptive_im.adaptive_im import adaptive_im
-    from Utilities.global_names import resources, facebook_network, communities, node2vec, adaptive_temp
-    import networkx as nx
-    import pickle
-    import timeit
-    import adaptive_im.IMLinUCB as IMLinUCB
-    import os
+def main():
     
     "Start time"
     start = timeit.default_timer()

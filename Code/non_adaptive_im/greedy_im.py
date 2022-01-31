@@ -111,7 +111,7 @@ def greedy_im(network, budget, diffusion_model, spontaneous_prob = [], n_sim = 1
     return best_seed_set, max_influence
 
 "Testing"
-if __name__ == '__main__':
+def main():
     
     """----------------------------------"""
     """READING/INTIALIZING THE NETWORK"""
