@@ -89,7 +89,7 @@ def get_features_nodes(
         )
     # Saving the edgelist to run node2vec on
     nx.write_edgelist(graph, FNAME_IN)
-    print("before\n")
+    #TODO node2vec.exe won't run for me
     # Preparing to run node2vec
     process = Popen(
         [
