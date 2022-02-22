@@ -201,7 +201,7 @@ def getPatterns(firstData, secondData, defaultIndex = None, defaultValue = None)
             patterns.append(pattern)
         else:
             patterns.append(pattern + "_*")
-            patterns.append(pattern + os.path.sep + "**" + os.path.sep + "*")
+            patterns.append(pattern + "_*" + os.path.sep + "**" + os.path.sep + "*")
         return patterns
     #If neither is None, you can specify the full pattern
     else:
@@ -692,6 +692,8 @@ def simpleCleanup(paths):
                     preDel.unlink()
 
 def cleanup(deletions):
+    if(len(deletions) == 0):
+        return
     actualDeletions  = toDelete(deletions)
     for deletion in actualDeletions:
         p = Path(deletion)
@@ -907,7 +909,7 @@ def addBreak_File(paths, section, index, last_index):
             root.mkdir(parents=True, exist_ok=True)
             oldpath.replace(newpath)
             
-    cleanup(deletions)
+    #cleanup(deletions)
 
 def removeBreak_File(paths, section, index, last_index):
     check_joints = getCheckJoints(section, index == last_index)
@@ -934,7 +936,7 @@ def removeBreak_File(paths, section, index, last_index):
             root.mkdir(parents=True, exist_ok=True)
             oldpath.replace(newpath)
             
-    cleanup(deletions)
+    #cleanup(deletions)
 
 def toggleBreak_File(basePath, section, index, data):
     base = Path(basePath)
