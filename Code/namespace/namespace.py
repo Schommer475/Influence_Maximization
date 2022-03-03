@@ -20,16 +20,20 @@ if os.path.exists(global_namespace):
     with open(global_namespace,"r") as f:
         data = json.load(f)
             
-    if data is None:
-        data = {"app_first":True}
-        
-    if "app_first" not in data:
-        raise ValueError("The global namespace file must have a bool variable 'app_first'")
-        
-    app_first = data["app_first"]
-    data = None
+if data is None:
+    data = {"app_first":True}
     
-
+if "app_first" not in data:
+    raise ValueError("The global namespace file must have a bool variable 'app_first'")
+    
+if not type(data["app_first"]) is bool:
+    raise ValueError("The variable 'app_first' in the global namespace must be a boolean")
+    
+app_first = data["app_first"]
+data = None
+    
+def getAppFirst():
+    return app_first
     
     
 def getAndValidateInput(section, identifier):
@@ -41,7 +45,7 @@ def getAndValidateInput(section, identifier):
         path = os.path.join(application_namespace, path)
     elif section == algorithms_index:
         expected_header = "alg" + expected_header
-        path = os.path.join(application_namespace, path)
+        path = os.path.join(algorithm_namespace, path)
     else:
         raise ValueError("Invalid section value")
         
@@ -909,7 +913,7 @@ def addBreak_File(paths, section, index, last_index):
             root.mkdir(parents=True, exist_ok=True)
             oldpath.replace(newpath)
             
-    #cleanup(deletions)
+    cleanup(deletions)
 
 def removeBreak_File(paths, section, index, last_index):
     check_joints = getCheckJoints(section, index == last_index)
@@ -936,7 +940,7 @@ def removeBreak_File(paths, section, index, last_index):
             root.mkdir(parents=True, exist_ok=True)
             oldpath.replace(newpath)
             
-    #cleanup(deletions)
+    cleanup(deletions)
 
 def toggleBreak_File(basePath, section, index, data):
     base = Path(basePath)
