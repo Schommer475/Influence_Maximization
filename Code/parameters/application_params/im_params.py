@@ -6,3 +6,8 @@ Created on Mon Feb 21 09:55:56 2022
 """
 
 networkType = "fl"
+cheatcode = "pls"
+cap = "ba"
+bells = "da"
+whistles = "b"
+other = "hello"

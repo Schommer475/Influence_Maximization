@@ -1,4 +1,14 @@
 {
-	"headers":["alg-cmab"],
-	"separators":[false]
+      "headers": [
+            "alg-cmab",
+            "trees",
+            "wood",
+            "water"
+      ],
+      "separators": [
+            false,
+            false,
+            true,
+            false
+      ]
 }

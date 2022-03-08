@@ -139,7 +139,7 @@ def buildBaseSection(section, data, inputs):
             path += os.path.sep
         else:
             path += "_"
-        path += inputs.get(section,data["headers"][i])
+        path += str(inputs.get(section,data["headers"][i]))
         
     return (path, data["separators"][-1])
 
@@ -260,7 +260,7 @@ def getPatterns(firstData, secondData, defaultIndex = None, defaultValue = None)
     
 def nonDefaultDeletions(path, firstData, secondData, defaultIndex, defaultValue):
     use_default = defaultIndex is not None and defaultValue is not None
-    index = 0
+    index = defaultIndex
     ret = []
     if not use_default:
         return []
@@ -308,6 +308,7 @@ def nonDefaultDeletions(path, firstData, secondData, defaultIndex, defaultValue)
                 if jointInfo["use_randID"]:
                     pattern += "_*"
             else:
+                index = 0
                 pattern += "*"
                     
     candidates = path.glob(pattern)
@@ -389,9 +390,9 @@ class PathingObject:
             raise ValueError("index2 out of bounds")
             
         if index1 < 0:
-            index1 = length - index1
+            index1 = length + index1
         if index2 < 0:
-            index2 = len(self.listing[index1]) - index2
+            index2 = len(self.listing[index1]) + index2
             
         if offset >= 0:
             while index1 < length:
@@ -1160,7 +1161,7 @@ def toggleTimestamp_Namespace(path, inputs):
        json.dump(inputs, f, indent=6)
 
 def toggleRandID_Namespace(path, inputs):
-    inputs["use_randId"] = not inputs["use_randId"]
+    inputs["use_randID"] = not inputs["use_randID"]
     with open(path, "w") as f:
        json.dump(inputs, f, indent=6)
 
@@ -1193,8 +1194,8 @@ def addParam_Namespace(path, inputs, param, useSep, index):
         inputs["headers"].append(param)
         inputs["separators"].append(useSep)
     else:
-        inputs["headers"].insert(param, index)
-        inputs["separators"].insert(useSep, index)
+        inputs["headers"].insert(index, param)
+        inputs["separators"].insert(index, useSep)
         
     with open(path, "w") as f:
        json.dump(inputs, f, indent=6)
@@ -1228,7 +1229,7 @@ def invert():
 def toggleTimestamp(application, algorithm, 
     default="0000-00-00-00-00-00"):
     if default is None or type(default) is not str:
-        raise ValueError("default must be an string specifying an eight digit random id")
+        raise ValueError("default must be an string specifying a timestamp in the format yyyy-MM-dd-hh-mm-ss")
     appData = getAndValidateInput(applications_index, application)
     algData = getAndValidateInput(algorithms_index, algorithm)
     joint = getAndValidateJoint(application, algorithm)
@@ -1359,7 +1360,7 @@ def getFilePath(inputs, timestamp, randId):
     
     
     jointName = app_name + "_" + alg_name
-    if jointName in loaded_applications:
+    if jointName in loaded_joints:
         joint_data = loaded_joints[jointName]
     else:
         joint_data = getAndValidateJoint(app_name, alg_name)

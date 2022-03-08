@@ -1,4 +1,4 @@
 {
-	"headers":["app-im","networkType"],
-	"separators":[false, true]
+	"headers":["app-im","cap","bells","whistles","other"],
+	"separators":[false,false,false,false,false]
 }
