@@ -52,14 +52,19 @@ if __name__ == "__main__":
 	"headers":["app-o2","cap","bells","whistles","other","ha"],
 	"separators":[True,False,False,False,False,False]
 }
-    
+    """
     base = Path(temp_dir)
     paths = namespace.namespace.getPaths(base, appData=app2, algData=alg7,defaultIndex=0,defaultValue="f")
     
     for p in paths:
         print(p)
+        
+    path1 = Path(os.path.join(temp_dir,"app-o1","n_n_n_n_n","alg-o3_n_n_d_n_n","file.txt"))
+    path2 = Path(os.path.join(temp_dir,"app-o1","n_n_d_n_n","alg-o5_n_n_d_n_n"))
+    namespace.namespace.simpleCleanup([path2])"""
     
-    #print(*namespace.namespace.toDelete([[["ya","ba"],["da","ba"],["doo"]],[["ya","ba"],["da","ba"],["bop"]],[["ya","ba"],["da","ba"],["doo"],["bp","chan"]]]),sep=", ")
+    for p in namespace.namespace.toDelete([[["ya","ba"],["da","ba"],["doo"]],[["ya","ba"],["da","ba"],["bop"]],[["ya","ba"],["da","ba"],["doo"],["bp","chan"]]]):
+        print(Path(p))
     
     #toggleBreak(2, "cmab", 0)
     #addParam(1, "im", "networkType", True, 1, "fb")

@@ -766,11 +766,11 @@ def extractInversionData(pathing):
 
 def simpleCleanup(paths):
     for preDel in paths:
-            if preDel.exists():
-                if preDel.is_dir():
-                    shutil.rmtree(preDel)
-                else:
-                    preDel.unlink()
+        if preDel.exists():
+            if preDel.is_dir():
+                shutil.rmtree(preDel)
+            else:
+                preDel.unlink()
 
 def cleanup(deletions):
     if(len(deletions) == 0):
