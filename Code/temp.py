@@ -67,7 +67,8 @@ if __name__ == "__main__":
     path2 = Path(os.path.join(temp_dir,"app-o1","n_n_d_n_n","alg-o5_n_n_d_n_n"))
     namespace.namespace.simpleCleanup([path2])"""
     
-    namespace.namespace.removeTimestamp_File(paths, joint, alg7["separators"][-1])
+    #namespace.namespace.removeTimestamp_File(paths, joint, alg7["separators"][-1])
+    namespace.namespace.toggleTimestamp_File(temp_dir, app1, alg5, joint, default="d")
     
     #toggleBreak(2, "cmab", 0)
     #addParam(1, "im", "networkType", True, 1, "fb")

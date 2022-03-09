@@ -928,7 +928,7 @@ def toggleRandID_File(basePath, application, appData, algorithm, algData,
         removeTimestamp_File(paths, joint, sep_after)
     else:
         paths = getPaths(base, appData, algData)
-        addTimestamp_File(paths, joint)
+        addTimestamp_File(paths, joint, default)
 
 def addTimeRandBreak_File(paths):
     deletions = []
