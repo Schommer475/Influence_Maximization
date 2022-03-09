@@ -1,5 +1,5 @@
 {
       "use_timestamp": true,
-      "use_randID": false,
+      "use_randID": true,
       "sep_after": false
 }

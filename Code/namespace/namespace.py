@@ -816,8 +816,13 @@ def addTimestamp_File(paths, joint, default="0000-00-00-00-00-00"):
             
         p.insert(i, j, default)
         if first_element:
-            i, j = p.getIndex(*p.baseIndices(), -1)
-            p.split(i, j)
+            if joint["sep_after"]:
+                i, j = p.getIndex(*p.baseIndices(), -1)
+                p.split(i, j)
+            i, j = p.getIndex(*p.baseIndices(), -2)
+            i2, j2 = p.getIndex(*p.baseIndices(), -1)
+            if i == i2:
+                p.split(i, j)
         deletions.append(original.findDeletion(p))
         newpath = p.getPath()
         root = p.getRoot()
@@ -852,16 +857,16 @@ def toggleTimestamp_File(basePath, appData, algData,
     joint, default="0000-00-00-00-00-00"):
     base = Path(basePath)
     if joint["use_timestamp"]:
-        sep_after = joint["sep_after"]
         paths = getPaths(base, appData, algData, 0, default)
         firstData, secondData, _ = orderInfo(appData, algData, joint)
+        sep_after = secondData["separators"][-1]
         preDeletions = nonDefaultDeletions(base, firstData, secondData, 0, default)
         simpleCleanup(preDeletions)
                 
         removeTimestamp_File(paths, joint, sep_after)
     else:
         paths = getPaths(base, appData, algData)
-        addTimestamp_File(paths, joint)
+        addTimestamp_File(paths, joint, default)
 
 def addRandID_File(paths, joint, default="00000000"):
     first_element = (not joint["use_timestamp"]) and (not joint["use_randID"])

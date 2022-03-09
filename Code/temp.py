@@ -52,6 +52,10 @@ if __name__ == "__main__":
 	"headers":["app-o2","cap","bells","whistles","other","ha"],
 	"separators":[True,False,False,False,False,False]
 }
+    
+    base = Path(temp_dir)
+    joint = {"use_timestamp":True,"use_randID":True,"sep_after":False}
+    paths = namespace.namespace.getPaths(base, app2, alg7, 0, "d")
     """
     base = Path(temp_dir)
     paths = namespace.namespace.getPaths(base, appData=app2, algData=alg7,defaultIndex=0,defaultValue="f")
@@ -63,8 +67,7 @@ if __name__ == "__main__":
     path2 = Path(os.path.join(temp_dir,"app-o1","n_n_d_n_n","alg-o5_n_n_d_n_n"))
     namespace.namespace.simpleCleanup([path2])"""
     
-    for p in namespace.namespace.toDelete([[["ya","ba"],["da","ba"],["doo"]],[["ya","ba"],["da","ba"],["bop"]],[["ya","ba"],["da","ba"],["doo"],["bp","chan"]]]):
-        print(Path(p))
+    namespace.namespace.removeTimestamp_File(paths, joint, alg7["separators"][-1])
     
     #toggleBreak(2, "cmab", 0)
     #addParam(1, "im", "networkType", True, 1, "fb")
