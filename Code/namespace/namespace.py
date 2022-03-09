@@ -9,6 +9,7 @@ import os.path
 from os import makedirs
 from pathlib import Path
 import shutil
+import re
 
 app_first = None
 loaded_applications = dict()
@@ -159,54 +160,90 @@ def orderInfo(appInfo, algInfo, jointInfo):
         return (appInfo, algInfo, jointInfo)
     return (algInfo, appInfo, jointInfo)
 
-def singletonPattern(data, defaultIndex = None, defaultValue = None, earlyTermination=False):
+def singletonPattern(data, defaultIndex = None, defaultValue = None, earlyTermination=False, filePattern=True):
     use_default = defaultIndex is not None and defaultValue is not None
-    pattern = ""
-    pattern += data["headers"][0]
-    for i in range(1, len(data["separators"])):
-        if data["separators"][i-1]:
-            pattern += os.path.sep
-        else:
-            pattern += "_"
-        if use_default and i == defaultIndex:
-            if earlyTermination:
+    pattern = r""
+    if filePattern:
+        pattern += data["headers"][0]
+        for i in range(1, len(data["separators"])):
+            if data["separators"][i-1]:
+                pattern += os.path.sep
+            else:
+                pattern += "_"
+            if use_default and i == defaultIndex:
+                if earlyTermination:
+                    pattern += "*"
+                    return pattern
+                pattern += defaultValue
+            else:
                 pattern += "*"
-                return pattern
-            pattern += defaultValue
-        else:
-            pattern += "*"
+    else:
+        pattern += data["headers"][0]
+        for i in range(1, len(data["separators"])):
+            if data["separators"][i-1]:
+                pattern += "\\" + os.path.sep
+            else:
+                pattern += "_"
+            if use_default and i == defaultIndex:
+                if earlyTermination:
+                    pattern += '[^_\\' + os.path.sep + ']*'
+                    return pattern
+                pattern += defaultValue
+            else:
+                pattern += '[^_\\' + os.path.sep + "]*"
     return pattern
 
-def getPatterns(firstData, secondData, defaultIndex = None, defaultValue = None):
+def getPatterns(firstData, secondData, defaultIndex = None, defaultValue = None, filePattern=True):
     patterns = []
     pattern = ""
     #Both are None only if inversion is happening, in which case you want all paths
     if firstData is None and secondData is None:
-        pattern = "**" + os.path.sep + "*"
-        patterns.append(pattern)
-        return patterns
+        if filePattern:
+            pattern = "**" + os.path.sep + "*"
+            patterns.append(pattern)
+            return patterns
+        else:
+            pattern = ".*"
+            patterns.append(pattern)
+            return patterns
     #If the first data is None, you need to do recursive search for the pattern of the second part
     elif firstData is None:
-        pattern = "**" + os.path.sep + "*"
-        pattern += singletonPattern(secondData, defaultIndex, defaultValue)
-        if secondData["separators"][-1]:
-            pattern += os.path.sep + "**" + os.path.sep + "*"
-            patterns.append(pattern)
+        if filePattern:
+            pattern = "**" + os.path.sep + "*"
+            pattern += singletonPattern(secondData, defaultIndex, defaultValue)
+            if secondData["separators"][-1]:
+                pattern += os.path.sep + "**" + os.path.sep + "*"
+                patterns.append(pattern)
+            else:
+                patterns.append(pattern + "_*")
+                patterns.append(pattern + os.path.sep + "**" + os.path.sep + "*")
+            return patterns
         else:
-            patterns.append(pattern + "_*")
-            patterns.append(pattern + os.path.sep + "**" + os.path.sep + "*")
-        return patterns
+            pattern = ".*"
+            pattern += singletonPattern(secondData, defaultIndex, defaultValue,filePattern=filePattern)
+            pattern +=  ".*"
+            patterns.append(pattern)
+            return patterns
     #If the second data is None, you can directly search for the pattern of the 
     #first part, but must recursively search for things afterwards
     elif secondData is None:
-        pattern += singletonPattern(firstData, defaultIndex, defaultValue)
-        if firstData["separators"][-1]:
-            pattern += os.path.sep + "**" + os.path.sep + "*"
-            patterns.append(pattern)
+        if filePattern:
+            pattern += singletonPattern(firstData, defaultIndex, defaultValue)
+            if firstData["separators"][-1]:
+                pattern += os.path.sep + "**" + os.path.sep + "*"
+                patterns.append(pattern)
+            else:
+                patterns.append(pattern + "_*")
+                patterns.append(pattern + "_*" + os.path.sep + "**" + os.path.sep + "*")
+            return patterns
         else:
-            patterns.append(pattern + "_*")
-            patterns.append(pattern + "_*" + os.path.sep + "**" + os.path.sep + "*")
-        return patterns
+            pattern += ".*" + singletonPattern(firstData, defaultIndex, defaultValue, filePattern=filePattern)
+            if firstData["separators"][-1]:
+                pattern += "\\" +os.path.sep + ".*"
+                patterns.append(pattern)
+            else:
+                patterns.append(pattern + "_.*")
+            return patterns
     #If neither is None, you can specify the full pattern
     else:
         use_default = defaultIndex is not None and defaultValue is not None
@@ -218,42 +255,78 @@ def getPatterns(firstData, secondData, defaultIndex = None, defaultValue = None)
             jointInfo = getAndValidateJoint(secondData["headers"][0][4:],
                         firstData["headers"][0][4:])
             
-        pattern += singletonPattern(firstData)
+        if filePattern:
+            pattern += singletonPattern(firstData,filePattern=filePattern)
+        else:
+            pattern += ".*" + singletonPattern(firstData,filePattern=filePattern)
         if firstData["separators"][-1]:
-            pattern += os.path.sep
+            if filePattern:
+                pattern += os.path.sep
+            else:
+                pattern += "\\" + os.path.sep
         else:
             pattern += "_"
             
-        pattern += singletonPattern(secondData)
+        pattern += singletonPattern(secondData,filePattern=filePattern)
         
-        if (jointInfo["use_timestamp"] or jointInfo["use_randID"]):
-            pattern += os.path.sep
-            if jointInfo["use_timestamp"]:
-                if use_default and defaultIndex == 0:
-                    pattern += defaultValue
-                else:
-                    pattern += "*"
-                if jointInfo["use_randID"]:
-                    if use_default and defaultIndex == 1:
-                        pattern += "_" + defaultValue
+        if filePattern:
+            if (jointInfo["use_timestamp"] or jointInfo["use_randID"]):
+                pattern += os.path.sep
+                if jointInfo["use_timestamp"]:
+                    if use_default and defaultIndex == 0:
+                        pattern += defaultValue
                     else:
-                        pattern += "_*"
-            else:
-                if use_default and defaultIndex == 1:
-                    pattern += defaultValue
+                        pattern += "*"
+                    if jointInfo["use_randID"]:
+                        if use_default and defaultIndex == 1:
+                            pattern += "_" + defaultValue
+                        else:
+                            pattern += "_*"
                 else:
-                    pattern += "*"
-            if jointInfo["sep_after"]:
+                    if use_default and defaultIndex == 1:
+                        pattern += defaultValue
+                    else:
+                        pattern += "*"
+                if jointInfo["sep_after"]:
+                    pattern += os.path.sep
+                else:
+                    pattern += "_"
+                        
+            elif secondData["separators"][-1]:
                 pattern += os.path.sep
             else:
                 pattern += "_"
-                    
-        elif secondData["separators"][-1]:
-            pattern += os.path.sep
+                
+            pattern += "*"
         else:
-            pattern += "_"
-            
-        pattern += "*"
+            if (jointInfo["use_timestamp"] or jointInfo["use_randID"]):
+                pattern += "\\" + os.path.sep
+                if jointInfo["use_timestamp"]:
+                    if use_default and defaultIndex == 0:
+                        pattern += defaultValue
+                    else:
+                        pattern += "[^_\\"+os.path.sep+"]*"
+                    if jointInfo["use_randID"]:
+                        if use_default and defaultIndex == 1:
+                            pattern += "_" + defaultValue
+                        else:
+                            pattern += "_[^_\\"+os.path.sep+"]*"
+                else:
+                    if use_default and defaultIndex == 1:
+                        pattern += defaultValue
+                    else:
+                        pattern += "[^_\\"+os.path.sep+"]*"
+                if jointInfo["sep_after"]:
+                    pattern += "\\" + os.path.sep
+                else:
+                    pattern += "_"
+                        
+            elif secondData["separators"][-1]:
+                pattern += "\\" + os.path.sep
+            else:
+                pattern += "_"
+                
+            pattern += "[^_\\"+os.path.sep+"]*"
         patterns.append(pattern)
         return patterns
     
@@ -624,6 +697,8 @@ def getPaths(base, appData=None, algData=None,
     
     firstData, secondData, _ = orderInfo(appData, algData, None)
     patterns = getPatterns(firstData, secondData, defaultIndex, defaultValue)
+    cpattern = getPatterns(firstData, secondData, defaultIndex, defaultValue, False)[0]
+    matcher = re.compile(cpattern)
     
                     
     foundPaths = set()
@@ -632,9 +707,10 @@ def getPaths(base, appData=None, algData=None,
         p = base.glob(pattern)
         for x in p: 
             if (x.is_file() and (x.stem != ".DS_Store") and (x.stem != ".gitkeep")):
-                if str(x) not in foundPaths:
-                    foundPaths.add(str(x))
-                    paths.append(x)
+                if matcher.fullmatch(str(x)) is not None:
+                    if str(x) not in foundPaths:
+                        foundPaths.add(str(x))
+                        paths.append(x)
              
     return paths
                         

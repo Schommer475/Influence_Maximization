@@ -19,23 +19,45 @@ if __name__ == "__main__":
     ts = "2022-10-24-14-54-33"
     rand = "1234567"
     
-    algdata = {
-"headers":["alg-cmab","trees""ta","at","rocks","wood","water"],
-"separators":[True,False,False,False,True,True,True]
+    alg3 = {
+"headers":["alg-o3","trees""ta","at","rocks","wood"],
+"separators":[False,False,False,False,False,True]
 }
-    appdata = {
-	"headers":["app-im","cap","bells","whistles","other"],
-	"separators":[False,False,False,False,False]
+    alg4 = {
+"headers":["alg-o4","trees""ta","at","rocks","wood"],
+"separators":[False,False,False,False,False,True]
+}
+    alg5 = {
+"headers":["alg-o5","trees""ta","at","rocks","wood"],
+"separators":[False,False,False,False,False,True]
+}
+    alg6 = {
+"headers":["alg-o6","trees""ta","at","rocks","wood"],
+"separators":[False,False,False,False,False,False]
+}
+    alg7 = {
+"headers":["alg-o7","trees""ta","at","rocks","wood"],
+"separators":[False,False,False,False,False,False]
+}
+    alg8 = {
+"headers":["alg-o8","trees""ta","at","rocks","wood"],
+"separators":[False,False,False,False,False,False]
+}
+    app1 = {
+	"headers":["app-o1","cap","bells","whistles","other","ha"],
+	"separators":[True,False,False,False,False,True]
 }
     
-    path = Path("hal\\da_alg-yab_y_y_y\\ya_ya_app-dab_b_b_b\\ba_do")
-    p = namespace.namespace.PathingObject(path)
-    print(p.listing)
-    p.split(1,0)
-    print(*p.algIndices())
-    print(*p.appIndices())
-    print(*p.baseIndices())
-    print(p.listing)
+    app2 = {
+	"headers":["app-o2","cap","bells","whistles","other","ha"],
+	"separators":[True,False,False,False,False,False]
+}
+    
+    base = Path(temp_dir)
+    paths = namespace.namespace.getPaths(base, appData=app2, algData=alg7,defaultIndex=0,defaultValue="f")
+    
+    for p in paths:
+        print(p)
     
     #print(*namespace.namespace.toDelete([[["ya","ba"],["da","ba"],["doo"]],[["ya","ba"],["da","ba"],["bop"]],[["ya","ba"],["da","ba"],["doo"],["bp","chan"]]]),sep=", ")
     
