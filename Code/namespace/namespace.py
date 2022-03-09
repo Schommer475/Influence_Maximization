@@ -914,21 +914,21 @@ def removeRandID_File(paths, joint, sep_after):
             
     cleanup(deletions)
 
-def toggleRandID_File(basePath, application, appData, algorithm, algData, 
+def toggleRandID_File(basePath, appData, algData, 
     joint, default="00000000"):
     base = Path(basePath)
     if joint["use_randID"]:
-        sep_after = joint["sep_after"]
         paths = getPaths(base, appData, algData, 1, default)
         
         firstData, secondData, _ = orderInfo(appData, algData, joint)
+        sep_after = secondData["separators"][-1]
         preDeletions = nonDefaultDeletions(base, firstData, secondData, 1, default)
         simpleCleanup(preDeletions)
         
-        removeTimestamp_File(paths, joint, sep_after)
+        removeRandID_File(paths, joint, sep_after)
     else:
         paths = getPaths(base, appData, algData)
-        addTimestamp_File(paths, joint, default)
+        addRandID_File(paths, joint, default)
 
 def addTimeRandBreak_File(paths):
     deletions = []

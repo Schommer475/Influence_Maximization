@@ -55,7 +55,7 @@ if __name__ == "__main__":
     
     base = Path(temp_dir)
     joint = {"use_timestamp":True,"use_randID":True,"sep_after":False}
-    paths = namespace.namespace.getPaths(base, app2, alg7, 0, "d")
+    paths = namespace.namespace.getPaths(base, app2, alg7, 1, "d")
     """
     base = Path(temp_dir)
     paths = namespace.namespace.getPaths(base, appData=app2, algData=alg7,defaultIndex=0,defaultValue="f")
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     path2 = Path(os.path.join(temp_dir,"app-o1","n_n_d_n_n","alg-o5_n_n_d_n_n"))
     namespace.namespace.simpleCleanup([path2])"""
     
-    #namespace.namespace.removeTimestamp_File(paths, joint, alg7["separators"][-1])
-    namespace.namespace.toggleTimestamp_File(temp_dir, app1, alg5, joint, default="d")
+    #namespace.namespace.removeRandID_File(paths, joint, alg7["separators"][-1])
+    namespace.namespace.toggleRandID_File(temp_dir, app2, alg7, joint, default="d")
     
     #toggleBreak(2, "cmab", 0)
     #addParam(1, "im", "networkType", True, 1, "fb")
