@@ -884,8 +884,13 @@ def addRandID_File(paths, joint, default="00000000"):
             
         p.insert(i, j, default)
         if first_element:
-            i, j = p.getIndex(*p.baseIndices(), -1)
-            p.split(i, j)
+            if joint["sep_after"]:
+                i, j = p.getIndex(*p.baseIndices(), -1)
+                p.split(i, j)
+            i, j = p.getIndex(*p.baseIndices(), -2)
+            i2, j2 = p.getIndex(*p.baseIndices(), -1)
+            if i == i2:
+                p.split(i, j)
         deletions.append(original.findDeletion(p))
         newpath = p.getPath()
         root = p.getRoot()
@@ -930,98 +935,27 @@ def toggleRandID_File(basePath, appData, algData,
         paths = getPaths(base, appData, algData)
         addRandID_File(paths, joint, default)
 
-def addTimeRandBreak_File(paths):
-    deletions = []
-    for oldpath in paths:
-        original = PathingObject(oldpath)
-        p = PathingObject(oldpath)
-        i, j = p.getIndex(*p.baseIndices(), -1)
-        p.split(i, j)
-        
-        deletions.append(original.findDeletion(p))
-        newpath = p.getPath()
-        root = p.getRoot()
-        root.mkdir(parents=True, exist_ok=True)
-        oldpath.replace(newpath)
-        
-    cleanup(deletions)
-
-def removeTimeRandBreak_File(paths):
-    deletions = []
-    for oldpath in paths:
-        original = PathingObject(oldpath)
-        p = PathingObject(oldpath)
-        i, j = p.getIndex(*p.baseIndices(), -1)
-        p.join(i)
-        
-        deletions.append(original.findDeletion(p))
-        newpath = p.getPath()
-        root = p.getRoot()
-        root.mkdir(parents=True, exist_ok=True)
-        oldpath.replace(newpath)
-        
-    cleanup(deletions)
 
 def toggleTimeRandBreak_File(basePath, appData, algData, joint):
     base = Path(basePath)
     paths = getPaths(base, appData, algData)
-    if joint["sep_after"]:
-        removeTimeRandBreak_File(paths)
-    else:
-        addTimeRandBreak_File(paths)
-
-def addBreak_File(paths, section, index, last_index):
-    check_joints = getCheckJoints(section, index == last_index)
+        
     deletions = []
-    
     for oldpath in paths:
         original = PathingObject(oldpath)
         p = PathingObject(oldpath)
-        containsTsRand = False
-        
-        if check_joints:
-            containsTsRand = checkJoint(p)
-        
-        if not containsTsRand:
-            if section == applications_index:
-                i, j = p.getIndex(*p.appIndices(), index)
-            else:
-                i, j = p.getIndex(*p.algIndices(), index)
-            
-            p.split(i, j)
-            deletions.append(original.findDeletion(p))
-            newpath = p.getPath()
-            root = p.getRoot()
-            root.mkdir(parents=True, exist_ok=True)
-            oldpath.replace(newpath)
-            
-    cleanup(deletions)
-
-def removeBreak_File(paths, section, index, last_index):
-    check_joints = getCheckJoints(section, index == last_index)
-    deletions = []
-    
-    for oldpath in paths:
-        original = PathingObject(oldpath)
-        p = PathingObject(oldpath)
-        containsTsRand = False
-        
-        if check_joints:
-            containsTsRand = checkJoint(p)
-        
-        if not containsTsRand:
-            if section == applications_index:
-                i, j = p.getIndex(*p.appIndices(), index)
-            else:
-                i, j = p.getIndex(*p.algIndices(), index)
-                
+        i, j = p.getIndex(*p.baseIndices(), -1)
+        if joint["sep_after"]:
             p.join(i)
-            deletions.append(original.findDeletion(p))
-            newpath = p.getPath()
-            root = p.getRoot()
-            root.mkdir(parents=True, exist_ok=True)
-            oldpath.replace(newpath)
-            
+        else:
+            p.split(i, j)
+        
+        deletions.append(original.findDeletion(p))
+        newpath = p.getPath()
+        root = p.getRoot()
+        root.mkdir(parents=True, exist_ok=True)
+        oldpath.replace(newpath)
+        
     cleanup(deletions)
 
 def toggleBreak_File(basePath, section, index, data):
@@ -1039,10 +973,35 @@ def toggleBreak_File(basePath, section, index, data):
     else:
         raise ValueError("Invalid section number")
         
-    if data["separators"][index]:
-        removeBreak_File(paths, section, index, last_index)
-    else:
-        addBreak_File(paths, section, index, last_index)
+    check_joints = getCheckJoints(section, index == last_index)
+    deletions = []
+    
+    for oldpath in paths:
+        original = PathingObject(oldpath)
+        p = PathingObject(oldpath)
+        containsTsRand = False
+        
+        if check_joints:
+            containsTsRand = checkJoint(p)
+        
+        if not containsTsRand:
+            if section == applications_index:
+                i, j = p.getIndex(*p.appIndices(), index)
+            else:
+                i, j = p.getIndex(*p.algIndices(), index)
+                
+            
+            if data["separators"][index]:
+                p.join(i)
+            else:
+                p.split(i, j)
+            deletions.append(original.findDeletion(p))
+            newpath = p.getPath()
+            root = p.getRoot()
+            root.mkdir(parents=True, exist_ok=True)
+            oldpath.replace(newpath)
+            
+    cleanup(deletions)
 
 def swap_File(basePath, section, index1, index2, data):
     deletions = []
