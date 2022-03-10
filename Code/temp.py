@@ -21,7 +21,7 @@ if __name__ == "__main__":
     
     alg3 = {
 "headers":["alg-o3","trees","ta","at","rocks","wood"],
-"separators":[False,False,True,False,False,False]
+"separators":[False,False,False,False,False,True]
 }
     alg4 = {
 "headers":["alg-o4","trees","ta","at","rocks","wood"],
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     namespace.namespace.simpleCleanup([path2])"""
     
     #namespace.namespace.invert()
-    namespace.namespace.swap_File(temp_dir, 2, 5, 2, alg3)
+    namespace.namespace.removeParam_File(temp_dir, 1, "ft", 6, app1)
     #namespace.namespace.toggleBreak_File(temp_dir, 2, 3, alg3)
     #namespace.namespace.toggleTimeRandBreak_File(temp_dir, app1, alg4, joint)
     #namespace.namespace.toggleTimestamp_File(temp_dir, app2, alg7, joint, default="d")

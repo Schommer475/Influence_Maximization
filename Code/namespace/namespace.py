@@ -1093,7 +1093,7 @@ def addParam_File(basePath, section, index, default, breakAfter, data):
         
     on_boundary = index == length
     paths = None
-    check_joints = getCheckJoints(section, on_boundary) and (not breakAfter)
+    check_joints = getCheckJoints(section, on_boundary)
     
     if section == applications_index:
         paths = getPaths(base,appData=data)
@@ -1113,21 +1113,15 @@ def addParam_File(basePath, section, index, default, breakAfter, data):
             i, j = p.getIndex(*p.appIndices(), index - 1)
             j += 1
         else:
-            i, j = p.getIndex(*p.appIndices(), index - 1)
+            i, j = p.getIndex(*p.algIndices(), index - 1)
             j += 1
             
         p.insert(i, j, default)
-        if not on_boundary:
+        if not on_boundary or not containsTsRand:
             if breakAfter and not data["separators"][index - 1]:
                 p.split(i, j)
             elif (not breakAfter) and data["separators"][index - 1]:
                 p.join(i)
-        else:
-            if not containsTsRand:
-                if breakAfter and not data["separators"][index - 1]:
-                    p.split(i, j)
-                elif (not breakAfter) and data["separators"][index - 1]:
-                    p.join(i)
             
         if data["separators"][index - 1]:
             p.split(i, j-1)
@@ -1177,8 +1171,8 @@ def removeParam_File(basePath, section, default, index, data):
             i0, j0 = p.getIndex(*p.appIndices(), index - 1)
             i, j = p.getIndex(*p.appIndices(), index)
         else:
-            i0, j0 = p.getIndex(*p.appIndices(), index - 1)
-            i, j = p.getIndex(*p.appIndices(), index)
+            i0, j0 = p.getIndex(*p.algIndices(), index - 1)
+            i, j = p.getIndex(*p.algIndices(), index)
     
         p.remove(i, j)
         if not (containsTsRand or (not different_policy) or data["separators"][index-1]):
