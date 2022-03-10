@@ -56,7 +56,8 @@ if __name__ == "__main__":
     
     #namespace.namespace.invert()
     #namespace.namespace.removeParam_File(temp_dir, 2, "d1", 5, alg3)
-    namespace.namespace.removeParam_File(temp_dir, 2, "d1", 5, alg6)
+    #namespace.namespace.removeParam(1,"o1",3,"d")
+    namespace.namespace.addParam(1,"o1","c",False,3,"d")
     #namespace.namespace.toggleBreak_File(temp_dir, 2, 4, alg3)
     #namespace.namespace.toggleBreak_File(temp_dir, 2, 4, alg6)
     #namespace.namespace.toggleTimeRandBreak_File(temp_dir, app1, alg4, joint)

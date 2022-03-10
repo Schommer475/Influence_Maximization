@@ -1,4 +1,18 @@
 {
-	"headers":["alg-o3","a","b","c","d","e"],
-	"separators":[false, false, false, false, false, true]
+      "headers": [
+            "alg-o3",
+            "a",
+            "b",
+            "c",
+            "d",
+            "e"
+      ],
+      "separators": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            true
+      ]
 }

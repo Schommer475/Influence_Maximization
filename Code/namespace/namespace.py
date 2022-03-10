@@ -520,6 +520,7 @@ class PathingObject:
                 for v1, v2 in zip(val, val2):
                     if v1 != v2:
                         return self.listing[:i+1]
+            return []
         else:
             for i, val in enumerate(other.listing):
                 val2 = self.listing[i]
@@ -528,6 +529,7 @@ class PathingObject:
                 for v1, v2 in zip(val, val2):
                     if v1 != v2:
                         return self.listing[:i+1]
+            return[]
                     
         return None
         
@@ -1325,9 +1327,9 @@ def toggleBreak(section, identifier, index):
 
 def swap(section, identifier, index1, index2):
     data = getAndValidateInput(section, identifier)
-    if index1 < 0 or index1 >= len(data["headers"]):
+    if index1 <= 0 or index1 >= len(data["headers"]):
         raise ValueError("Index 1 out of bounds")
-    if index2 < 0 or index2 >= len(data["headers"]):
+    if index2 <= 0 or index2 >= len(data["headers"]):
         raise ValueError("Index 2 out of bounds")
         
     if index1 != index2:

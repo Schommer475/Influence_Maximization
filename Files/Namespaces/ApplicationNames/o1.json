@@ -1,4 +1,18 @@
 {
-	"headers":["app-o1","a","b","c","d","e"],
-	"separators":[true, false, false, false, false, true]
+      "headers": [
+            "app-o1",
+            "a",
+            "b",
+            "c",
+            "d",
+            "e"
+      ],
+      "separators": [
+            true,
+            false,
+            false,
+            false,
+            false,
+            true
+      ]
 }
