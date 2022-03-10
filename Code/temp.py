@@ -21,7 +21,7 @@ if __name__ == "__main__":
     
     alg3 = {
 "headers":["alg-o3","trees","ta","at","rocks","wood"],
-"separators":[False,False,False,False,False,True]
+"separators":[False,False,False,False,True,True]
 }
     alg4 = {
 "headers":["alg-o4","trees","ta","at","rocks","wood"],
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 }
     alg6 = {
 "headers":["alg-o6","trees","ta","at","rocks","wood"],
-"separators":[False,False,False,False,False,False]
+"separators":[False,False,False,False,True,False]
 }
     alg7 = {
 "headers":["alg-o7","trees","ta","at","rocks","wood"],
@@ -53,30 +53,12 @@ if __name__ == "__main__":
 	"separators":[True,False,False,False,False,False]
 }
     
-    base = Path(temp_dir)
-    joint = {"use_timestamp":False,"use_randID":True,"sep_after":True}
-    paths = namespace.namespace.getPaths(base, app2, alg7, 1, "d")
-    """
-    base = Path(temp_dir)
-    paths = namespace.namespace.getPaths(base, appData=app2, algData=alg7,defaultIndex=0,defaultValue="f")
-    
-    for p in paths:
-        print(p)
-        
-    path1 = Path(os.path.join(temp_dir,"app-o1","n_n_n_n_n","alg-o3_n_n_d_n_n","file.txt"))
-    path2 = Path(os.path.join(temp_dir,"app-o1","n_n_d_n_n","alg-o5_n_n_d_n_n"))
-    namespace.namespace.simpleCleanup([path2])"""
     
     #namespace.namespace.invert()
-    namespace.namespace.removeParam_File(temp_dir, 1, "ft", 6, app1)
-    #namespace.namespace.toggleBreak_File(temp_dir, 2, 3, alg3)
+    #namespace.namespace.removeParam_File(temp_dir, 2, "d1", 5, alg3)
+    namespace.namespace.removeParam_File(temp_dir, 2, "d1", 5, alg6)
+    #namespace.namespace.toggleBreak_File(temp_dir, 2, 4, alg3)
+    #namespace.namespace.toggleBreak_File(temp_dir, 2, 4, alg6)
     #namespace.namespace.toggleTimeRandBreak_File(temp_dir, app1, alg4, joint)
     #namespace.namespace.toggleTimestamp_File(temp_dir, app2, alg7, joint, default="d")
     
-    #toggleBreak(2, "cmab", 0)
-    #addParam(1, "im", "networkType", True, 1, "fb")
-    #"""
-    #params = ParamSet("im","cmab",[],{"networkType":"fl"},[])
-    
-    #print(params.getPath("2022-02-21-09-53-46","00000000"))
-    #"""

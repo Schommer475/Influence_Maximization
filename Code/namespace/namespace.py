@@ -334,6 +334,7 @@ def getPatterns(firstData, secondData, defaultIndex = None, defaultValue = None,
 def nonDefaultDeletions(path, firstData, secondData, defaultIndex, defaultValue):
     use_default = defaultIndex is not None and defaultValue is not None
     index = defaultIndex
+    reset = False
     ret = []
     if not use_default:
         return []
@@ -348,6 +349,7 @@ def nonDefaultDeletions(path, firstData, secondData, defaultIndex, defaultValue)
         for i in range(defaultIndex):
             if secondData["separators"][i]:
                 index = defaultIndex - (i + 1)
+                reset = True
     #If the second data is None, you can directly search for the pattern of the 
     #first part up to the default
     elif secondData is None:
@@ -355,6 +357,7 @@ def nonDefaultDeletions(path, firstData, secondData, defaultIndex, defaultValue)
         for i in range(defaultIndex):
             if firstData["separators"][i]:
                 index = defaultIndex - (i + 1)
+                reset = True
     #If neither is None, you can specify the full pattern
     else:
         index = defaultIndex
@@ -388,7 +391,13 @@ def nonDefaultDeletions(path, firstData, secondData, defaultIndex, defaultValue)
     for c in candidates:
         pt = c.parts[-1]
         subs = pt.split("_")
-        if subs[index] != defaultValue:
+        start = 0
+        if firstData is None and not reset:
+            for i in range(len(subs)):
+                if subs[i] == secondData["headers"][0]:
+                    start = i
+                    break
+        if subs[start + index] != defaultValue:
             ret.append(c)
             
     return ret
@@ -1148,12 +1157,12 @@ def removeParam_File(basePath, section, default, index, data):
     check_joints = getCheckJoints(section, on_boundary)
     
     if section == applications_index:
-        paths = getPaths(base, appData=data, defaultIndex=index, defaultVaue=default)
+        paths = getPaths(base, appData=data, defaultIndex=index, defaultValue=default)
         firstData, secondData, _ = orderInfo(data, None, None)
         preDeletions = nonDefaultDeletions(base, firstData, secondData, index, default)
         simpleCleanup(preDeletions)
     else:
-        paths = getPaths(base, algData=data, defaultIndex=index, defaultVaue=default)
+        paths = getPaths(base, algData=data, defaultIndex=index, defaultValue=default)
         firstData, secondData, _ = orderInfo(None, data, None)
         preDeletions = nonDefaultDeletions(base, firstData, secondData, index, default)
         simpleCleanup(preDeletions)
