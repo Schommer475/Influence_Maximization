@@ -1058,15 +1058,21 @@ def swap_File(basePath, section, index1, index2, data):
         p.set(i2, j2, temp)
         if different_policy:
             if data["separators"][greater_index]:
-                p.join(i1)
-            else:
                 p.split(i1, j1)
+            else:
+                p.join(i1)
                 
+            if section == applications_index:
+                i1, j1 = p.getIndex(*p.appIndices(), lesser_index)
+                i2, j2 = p.getIndex(*p.appIndices(), greater_index)
+            else:
+                i1, j1 = p.getIndex(*p.algIndices(), lesser_index)
+                i2, j2 = p.getIndex(*p.algIndices(), greater_index)
             if not containsTsRand:
                 if data["separators"][lesser_index]:
-                    p.join(i2)
-                else:
                     p.split(i2, j2)
+                else:
+                    p.join(i2)
                 
         deletions.append(original.findDeletion(p))
         newpath = p.getPath()

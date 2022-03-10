@@ -20,27 +20,27 @@ if __name__ == "__main__":
     rand = "1234567"
     
     alg3 = {
-"headers":["alg-o3","trees""ta","at","rocks","wood"],
-"separators":[False,False,False,False,False,True]
+"headers":["alg-o3","trees","ta","at","rocks","wood"],
+"separators":[False,False,True,False,False,False]
 }
     alg4 = {
-"headers":["alg-o4","trees""ta","at","rocks","wood"],
+"headers":["alg-o4","trees","ta","at","rocks","wood"],
 "separators":[False,False,False,False,False,True]
 }
     alg5 = {
-"headers":["alg-o5","trees""ta","at","rocks","wood"],
+"headers":["alg-o5","trees","ta","at","rocks","wood"],
 "separators":[False,False,False,False,False,True]
 }
     alg6 = {
-"headers":["alg-o6","trees""ta","at","rocks","wood"],
+"headers":["alg-o6","trees","ta","at","rocks","wood"],
 "separators":[False,False,False,False,False,False]
 }
     alg7 = {
-"headers":["alg-o7","trees""ta","at","rocks","wood"],
+"headers":["alg-o7","trees","ta","at","rocks","wood"],
 "separators":[False,False,False,False,False,False]
 }
     alg8 = {
-"headers":["alg-o8","trees""ta","at","rocks","wood"],
+"headers":["alg-o8","trees,""ta","at","rocks","wood"],
 "separators":[False,False,False,False,False,False]
 }
     app1 = {
@@ -67,8 +67,10 @@ if __name__ == "__main__":
     path2 = Path(os.path.join(temp_dir,"app-o1","n_n_d_n_n","alg-o5_n_n_d_n_n"))
     namespace.namespace.simpleCleanup([path2])"""
     
-    #namespace.namespace.removeRandID_File(paths, joint, alg7["separators"][-1])
-    namespace.namespace.toggleTimeRandBreak_File(temp_dir, app1, alg4, joint)
+    #namespace.namespace.invert()
+    namespace.namespace.swap_File(temp_dir, 2, 5, 2, alg3)
+    #namespace.namespace.toggleBreak_File(temp_dir, 2, 3, alg3)
+    #namespace.namespace.toggleTimeRandBreak_File(temp_dir, app1, alg4, joint)
     #namespace.namespace.toggleTimestamp_File(temp_dir, app2, alg7, joint, default="d")
     
     #toggleBreak(2, "cmab", 0)
