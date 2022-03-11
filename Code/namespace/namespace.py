@@ -423,7 +423,31 @@ def toDelete(deletionObjects):
             if not pstring in current:
                 current[pstring] = dict()
             current = current[pstring]
+            
+    
     return recursiveList("",toDel)
+
+def build(initial, insert):
+    current = initial
+    for part in insert:
+        pstring = "_".join(part)
+        if not pstring in current:
+            current[pstring] = dict()
+        current = current[pstring]
+        
+def compare(old, new, current):
+    if len(old) == 0 and len(new) == 0:
+        current["___keepme___"]=dict()
+    else:
+        for key in old:
+            current[key] = dict()
+            if key in new:
+                compare(old[key], new[key], current[key])
+                
+def toDelete2(old, new):
+    current = dict()
+    compare(old, new, current)
+    return recursiveList("",current)
            
 
 class PathingObject:
@@ -529,7 +553,7 @@ class PathingObject:
                 for v1, v2 in zip(val, val2):
                     if v1 != v2:
                         return self.listing[:i+1]
-            return[]
+            return []
                     
         return None
         
@@ -794,6 +818,16 @@ def cleanup(deletions):
                 shutil.rmtree(p)
             else:
                 p.unlink()
+                
+def swapCleanup(old, new):
+    actualDeletions  = toDelete2(old, new)
+    for deletion in actualDeletions:
+        p = Path(deletion)
+        if p.exists():
+            if p.is_dir():
+                shutil.rmtree(p)
+            else:
+                p.unlink()
 
 def invert_File(basePath):
     base = Path(basePath)
@@ -1015,7 +1049,8 @@ def toggleBreak_File(basePath, section, index, data):
     cleanup(deletions)
 
 def swap_File(basePath, section, index1, index2, data):
-    deletions = []
+    old = dict()
+    new = dict()
     base = Path(basePath)
     check_joints = True
     length = len(data["headers"])
@@ -1051,6 +1086,7 @@ def swap_File(basePath, section, index1, index2, data):
     
     for oldpath in paths:
         original = PathingObject(oldpath)
+        build(old, original.listing)
         p = PathingObject(oldpath)
         containsTsRand = False
         
@@ -1085,13 +1121,13 @@ def swap_File(basePath, section, index1, index2, data):
                 else:
                     p.join(i2)
                 
-        deletions.append(original.findDeletion(p))
+        build(new, p.listing)
         newpath = p.getPath()
         root = p.getRoot()
         root.mkdir(parents=True, exist_ok=True)
         oldpath.replace(newpath)
         
-    cleanup(deletions)
+    swapCleanup(old, new)
 
 def addParam_File(basePath, section, index, default, breakAfter, data):
     deletions = []

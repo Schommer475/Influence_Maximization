@@ -53,11 +53,13 @@ if __name__ == "__main__":
 	"separators":[True,False,False,False,False,False]
 }
     
-    
     #namespace.namespace.invert()
     #namespace.namespace.removeParam_File(temp_dir, 2, "d1", 5, alg3)
-    #namespace.namespace.removeParam(1,"o1",3,"d")
-    namespace.namespace.addParam(1,"o1","c",False,3,"d")
+    #namespace.namespace.removeParam(1,"o1",2,"d")
+    namespace.namespace.toggleBreak(2, "o3", 2)
+    namespace.namespace.toggleBreak(2, "o3", 3)
+    #namespace.namespace.swap(2, "o3", 2, 3)
+    #namespace.namespace.addParam(1,"o1","c",False,3,"d")
     #namespace.namespace.toggleBreak_File(temp_dir, 2, 4, alg3)
     #namespace.namespace.toggleBreak_File(temp_dir, 2, 4, alg6)
     #namespace.namespace.toggleTimeRandBreak_File(temp_dir, app1, alg4, joint)
