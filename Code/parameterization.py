@@ -44,6 +44,66 @@ def lookupParams(section: int,outerName: str, innerName: str):
     else:
         raise ValueError("Invalid parameter section identifier: " + str(section))
 
+def validateInputD(data):
+    pass
+
+def validateCount(total, lst, name):
+    pass
+
+def getAndValidateInput(fileName):
+    if not (os.path.exists(fileName) and os.path.isfile(fileName)):
+        raise IOError("File " + str(fileName) + " does not exist or is not a file.")
+    with open(fileName) as f:
+        inputs = json.load(f)
+        
+        if not "num_experiments" in inputs:
+            raise ValueError("Input file expected to have a field 'num_experiments' with a positive integer.")
+        if not type(inputs["num_experiments"]) is int:
+            raise ValueError("The field 'num_experiments' is expected to be a positive integer.")
+        if inputs["num_experiments"] < 1:
+            raise ValueError("'num_experiments' must be at least 1.")
+            
+        if not "global_vars" in inputs:
+            inputs["global_vars"] = dict()
+        if not type(inputs["global_vars"]) is dict:
+            raise ValueError("The field 'global_vars' is expected to be a dictionary of global parameters.")
+            
+        if not "unique_globals" in inputs:
+            inputs["unique_globals"] = False
+        if not type(inputs["unique_globals"]) is bool:
+            raise ValueError("The field 'unique_globals' is expected to be a boolean.")
+                
+        if not "applications" in inputs:
+            raise ValueError("Input file expected to have a field 'applications' with a non-empty list of objects.")
+        if not type(inputs["applications"]) is list:
+            raise ValueError("The field 'applications' is expected to be a non-empty list of objects.")
+        if len(inputs["applications"]) == 0:
+            raise ValueError("The list 'applications' must be non-empty.")
+        for o in inputs["applications"]:
+            if not type(o) is dict:
+                raise ValueError("Every item in 'applications' must be a JSON object (a Python dictionary).")
+                
+        if not "algorithms" in inputs:
+            raise ValueError("Input file expected to have a field 'algorithms' with a non-empty list of objects.")
+        if not type(inputs["algorithms"]) is list:
+            raise ValueError("The field 'algorithms' is expected to be a non-empty list of objects.")
+        if len(inputs["algorithms"]) == 0:
+            raise ValueError("The list 'algorithms' must be non-empty.")
+        for o in inputs["algorithms"]:
+            if not type(o) is dict:
+                raise ValueError("Every item in 'algorithms' must be a JSON object (a Python dictionary).")
+                
+        for i in ["applications", "algorithms"]:
+            for o in inputs[i]:
+                validateInputD(o)
+            validateCount(inputs["num_experiments"], inputs[i], i)
+
+def listModules(data):
+    pass
+
+def loadModules(data):
+    pass
+
 
 
 
