@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 21 09:55:40 2022
+Created on Sun Mar 20 10:53:22 2022
 
 @author: raqua
 """
 
-trees = "birch"
-rocks = "granite"
-water = "spring"
-wood = "cherry"
+trees = True
+wood = "Cedar"
+water = "H2O"
+doFullCheck = True
+
+def validateSolo(data):
+    print("validating cmab")
+    
+def validateFull(data):
+    print("fully validating cmab")

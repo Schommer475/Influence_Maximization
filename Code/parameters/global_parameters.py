@@ -6,6 +6,11 @@ Created on Sun Feb  6 11:52:08 2022
 """
 
 num_cores = 20
-
+gabby = "hello"
+doFullCheck = True
 def validateSolo(g_params):
+    print("validating globals")
     return True
+
+def validateFull(data):
+    print("fully validating globals")

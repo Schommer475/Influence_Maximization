@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 21 09:55:56 2022
+Created on Sun Mar 20 11:34:01 2022
 
 @author: raqua
 """
 
-networkType = "fl"
-cheatcode = "pls"
-cap = "ba"
-bells = "da"
-whistles = "b"
-other = "hello"
+cap = "baseball"
+bells = "white-chocolate"
+whistles = True
+other = 32.224
+doFullCheck = True
+
+def validateSolo(data):
+    print("validating im")
+    
+    
+def validateFull(data):
+    print("fully validating im")

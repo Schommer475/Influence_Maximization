@@ -21,7 +21,7 @@ loadedParams["algorithms"] = dict()
 
 def lookupParams(section: int,outerName: str, innerName: str):
     if section == globals_index:
-        if innerName in loadedParams["globals"].names:
+        if innerName in loadedParams["globals"]:
             return getattr(loadedParams["globals"],innerName)
         else:
             raise ValueError("'" + str(innerName) + "' is not a known global variable.")
@@ -202,7 +202,7 @@ def listModules(data):
     ret = {"params":[], "builders":[]}
     if not os.path.exists(os.path.join("parameters","global_parameters.py")):
         raise ValueError("There must be a file 'global_parameters.py' in the parameters module.")
-    ret["params"].append(("globals",".global_parameters","parameters"))
+    ret["params"].append(("globals","",".global_parameters","parameters"))
     
     expected = dict()
     
@@ -226,7 +226,7 @@ def listModules(data):
         pth = os.path.join(p1,it["module"]+".py")
         if not os.path.exists(pth):
             raise ValueError("There is no parameter file: " + pth)
-        ret["params"].append((it["section"], p2, "."+it["module"]))
+        ret["params"].append((it["section"], item, p2, "."+it["module"]))
         
     for package in ["application", "algorithm"]:
         for path, directories, files in os.path.walk(package):
@@ -235,7 +235,7 @@ def listModules(data):
                     it = expected[file[:-3]]["usage"]
                     truePackage = path.replace(os.path.sep, ".")
                     name = "." + it["module"]
-                    ret["builders"].append((it["package"],truePackage,name))
+                    ret["builders"].append((it["module"],it["package"],truePackage,name))
                     del expected[file[:-3]]
                     
     if len(expected) > 0:
@@ -246,35 +246,81 @@ def listModules(data):
     return ret
                     
 def loadModules(data):
-    pass
+    ret = {"application":dict(),"algorithm":dict()}
+    for section, name, package, module in data["params"]:
+        if section == "globals":
+            loadedParams[section] = import_module(name,package)
+        else:
+            loadedParams[section][name] = import_module(name,package)
+            
+    for name, section, package, module in data["builders"]:
+        ret[section][name] = import_module(name,package)
+        
+    return ret
 
 
-
-
+    
+class GlobalParamSet:
+    def __init__(self, globalPars):
+        self.globalParams = globalPars
+        
+    def get(self,name: str):
+        if name in self.globalParams:
+            return self.globalParams[name]
+        else:
+            return lookupParams(globals_index, "globals", name)
+    
+    def setAttr(self,name: str, value):
+        self.globalParams[name] = value
+    
+class ApplicationParamSet:
+    def __init__(self, name, pars):
+        self.params = pars
+        self.name = name
+        
+    def get(self,name: str):
+        if name in self.params:
+            return self.params[name]
+        else:
+            return lookupParams(applications_index, self.name, name)
+    
+    def setAttr(self,name: str, value):
+        self.params[name] = value
+        
+    def getName(self):
+        return self.name
+    
+class AlgorithmParamSet:
+    def __init__(self, name, pars):
+        self.params = pars
+        self.name = name
+        
+    def get(self,name: str):
+        if name in self.params:
+            return self.params[name]
+        else:
+            return lookupParams(algorithms_index, self.name, name)
+    
+    def setAttr(self,name: str, value):
+        self.params[name] = value
+        
+    def getName(self):
+        return self.name
+    
+    
 class ParamSet:
-    def __init__(self, appName, algName, globalPars, appPars, algPars):
+    def __init__(self, globalPars, appPars, algPars):
         self.globalParams = globalPars
         self.applicationParams = appPars
         self.algorithmParams = algPars
-        self.applicationName = appName
-        self.algorithmName = algName
         
     def get(self,section: int,name: str):
         if section == globals_index:
-            if name in self.globalParams:
-                return self.globalParams[name]
-            else:
-                return lookupParams(section, "globals", name)
+            return self.globalParams.get(name)
         elif section == applications_index:
-            if name in self.applicationParams:
-                return self.applicationParams[name]
-            else:
-                return lookupParams(section, self.applicationName, name)
+            return self.applicationParams.get(name)
         elif section == algorithms_index:
-            if name in self.algorithmParams:
-                return self.algorithmParams[name]
-            else:
-                return lookupParams(section, self.algorithmName, name)
+            return self.algorithmParams.get(name)
         else:
             raise ValueError("Invalid parameter section identifier: " + str(section))
     
@@ -297,6 +343,91 @@ class ParamSet:
     def getPath(self, timestamp, randId):
         return namespace.getFilePath(self, timestamp, randId)
     
+    
+def firstValidation(data):
+    loadedParams["globals"].validateSolo(data["global_vars"])
+    for i in ["applications", "algorithms"]:
+        for dat in data[i]:
+            loadedParams[i][dat["name"]].validateSolo(dat)
+            
+def fillOut(data,modules):
+    globalValues = None
+    otherValues = {"application":[],"algorithm":[]}
+    indices = dict()
+    
+    if data["unique_globals"]:
+        globalValues = [GlobalParamSet(copy.deepcopy(data["global_vars"])) for _ in range(data["num_experiments"])]
+        for i in range(data["num_experiments"]):
+            indices[i] = {"globals":i}
+    else:
+        globalValues = [GlobalParamSet(data["global_vars"])]
+        for i in range(data["num_experiments"]):
+            indices[i] = {"globals":0}
+            
+    for key in otherValues:
+        count = 0
+        for item in data[key + "s"]:
+            first = True
+            currentInstance = None
+            currentPset = None
+            for r in item["ranges"]:
+                for i in range(r[0],r[1]+1):
+                    if item["unique_instance"] or item["unique"] or first:
+                        if item["unique"] or first:
+                            if key == "applications":
+                                currentPset = ApplicationParamSet(item["name"], copy.deepcopy(item["params"]))
+                            else:
+                                currentPset = AlgorithmParamSet(item["name"], copy.deepcopy(item["params"]))
+                        count += 1
+                        if item["unique_instance"] or first:
+                            count += 1
+                            currentInstance = {"params":currentPset,"instance":modules[key][item["name"]].createInstance(currentPset)}
+                            otherValues[key].append(currentInstance)
+                            first = False
+                    indices[i][key] = count - 1
+                    
+    return [{"globals":globalValues[indices[i]["globals"]]
+             ,"applications":otherValues["application"][indices[i]["application"]]
+             ,"algorithms":otherValues["algorithm"][indices[i]["algorithm"]]}
+            for i in range(data["num_experiments"])]
+
+def createAndValidateParams(data, modules):
+    dat = fillOut(data, modules)
+    ret = []
+    for g, ap, al in dat:
+        p = ParamSet(g, ap["params"], al["params"])
+        
+        if (hasattr(loadedParams["globals"],"doFullCheck") and 
+            (type(loadedParams["globals"].doFullCheck) is bool)
+            and loadedParams["global_vars"].doFullCheck):
+            loadedParams["global_vars"].validateFull(p)
+        
+        if (hasattr(loadedParams["applications"][ap["params"].getName()],"doFullCheck") and 
+            (type(loadedParams["applications"][ap["params"].getName()].doFullCheck) is bool)
+            and loadedParams["applications"][ap["params"].getName()].doFullCheck):
+            loadedParams["applications"][ap["params"].getName()].validateFull(p)
+            
+        if (hasattr(loadedParams["algorithms"][al["params"].getName()],"doFullCheck") and 
+            (type(loadedParams["algorithms"][al["params"].getName()].doFullCheck) is bool)
+            and loadedParams["algorithms"][al["params"].getName()].doFullCheck):
+            loadedParams["algorithms"][al["params"].getName()].validateFull(p)
+            
+        ret.append((p, ap["instance"], al["instance"]))
+        
+    return ret
+        
+
+
+def readInFile(fileName):
+    data = getAndValidateInput(fileName)
+    modules = loadModules(listModules(data))
+    ret = None
+    if data["unique_globals"]:
+        ret = GlobalParamSet(copy.deepcopy(data["global_vars"]))
+    else:
+        ret = GlobalParamSet(data["global_vars"])
+        
+    return (ret, createAndValidateParams(data, modules))
 
 def fill(inputs, toFill, count, varName, debugName):
     for item in inputs[varName]:
