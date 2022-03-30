@@ -6,7 +6,7 @@ Created on Sat Feb  5 15:19:04 2022
 """
 from namespace import namespace
 from Utilities.program_vars import globals_index, applications_index, algorithms_index, \
-    default_unique_instance
+    default_unique_instance, joint_index
 from importlib import import_module
 import os
 import json
@@ -30,6 +30,10 @@ class ModuleHandler:
         if not hasattr(self.module, name):
             raise ValueError(self.errmsg1 + name + self.errmsg2)
         return getattr(self.module, name)
+    
+    def reset(self):
+        self.initialized = False
+        self.module = None
             
 
 
@@ -285,6 +289,7 @@ class ParamSet:
         self.globalParams = globalPars
         self.applicationParams = appPars
         self.algorithmParams = algPars
+        self.jointParams = None
         
     def get(self,section: int,name: str):
         if section == globals_index:
@@ -293,8 +298,18 @@ class ParamSet:
             return self.applicationParams.get(name)
         elif section == algorithms_index:
             return self.algorithmParams.get(name)
+        elif section == joint_index and self.jointParams is not None:
+            if name in self.jointParams:
+                return self.jointParams[name]
+            else:
+                raise ValueError("There is no field " + str(name))
         else:
             raise ValueError("Invalid parameter section identifier: " + str(section))
+            
+    def reset(self):
+        self.globalParams.reset()
+        self.applicationParams.reset()
+        self.algorithmParams.reset()
     
     def setAttr(self, section: int,name: str, value):
         if section == globals_index:
@@ -303,6 +318,10 @@ class ParamSet:
             self.applicationParams.setAttr(name,value)
         elif section == algorithms_index:
             self.algorithmParams.setAttr(name,value)
+        elif section == joint_index:
+            if self.jointParams is None:
+                self.jointParams = dict()
+            self.joinParams[name] = value
         else:
             raise ValueError("Invalid parameter section identifier: " + str(section))
     
@@ -371,18 +390,19 @@ def createAndValidateParams(data, modules, backup, loadedParams):
         if (hasattr(loadedParams["globals"],"doFullCheck") and 
             (type(loadedParams["globals"].doFullCheck) is bool)
             and loadedParams["globals"].doFullCheck):
-            loadedParams["globals"].validateFull(p)
+            loadedParams["globals"].validateFull(p,ap["instance"],al["instance"])
         
         if (hasattr(loadedParams["applications"][ap["params"].getName()],"doFullCheck") and 
             (type(loadedParams["applications"][ap["params"].getName()].doFullCheck) is bool)
             and loadedParams["applications"][ap["params"].getName()].doFullCheck):
-            loadedParams["applications"][ap["params"].getName()].validateFull(p)
+            loadedParams["applications"][ap["params"].getName()].validateFull(p,ap["instance"],al["instance"])
             
         if (hasattr(loadedParams["algorithms"][al["params"].getName()],"doFullCheck") and 
             (type(loadedParams["algorithms"][al["params"].getName()].doFullCheck) is bool)
             and loadedParams["algorithms"][al["params"].getName()].doFullCheck):
-            loadedParams["algorithms"][al["params"].getName()].validateFull(p)
+            loadedParams["algorithms"][al["params"].getName()].validateFull(p,ap["instance"],al["instance"])
             
+        p.reset()
         ret.append((p, ap["instance"], al["instance"]))
         
     return ret

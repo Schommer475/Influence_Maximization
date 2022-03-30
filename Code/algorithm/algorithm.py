@@ -2,7 +2,7 @@
 """
 Created on Sat Feb  5 16:43:51 2022
 
-@author: raqua
+@author: Tim Schommer
 """
 
 from abc import ABC, abstractmethod

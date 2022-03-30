@@ -33,7 +33,7 @@ class Outputer:
     
 def worker(seed, queue, params, application, algorithm):
     random.seed(seed)
-    numpy.random.seed(random.randint(0, 2**32))
+    numpy.random.seed(random.randint(0, 2**32 - 1))
     algorithm.run(application,params)
     queue.put(seed)
     
@@ -62,10 +62,11 @@ if __name__=="__main__":
         if len(sys.argv) >= 4 and sys.argv[2] == "-s":
             seed = int(sys.argv[3])
         else:
-            seed = random.randint(0, 2**32)
+            seed = random.randint(0, 2**32 - 1)
             
         print("Run id is: " + str(seed))
         random.seed(seed)
+        numpy.random.seed(random.randint(0, 2**32 - 1))
         globs, runs = readInFile(infile)
         
         data = None
@@ -81,9 +82,9 @@ if __name__=="__main__":
         toRun = []
         newKeys = set()
         for i in range(len(runs)):
-            sd = random.randint(0, 2**32)
+            sd = random.randint(0, 2**32 - 1)
             while sd in newKeys:
-                sd = random.randint(0, 2**32)
+                sd = random.randint(0, 2**32 - 1)
             newKeys.add(sd)
             key = str(sd)
             if key not in data:
