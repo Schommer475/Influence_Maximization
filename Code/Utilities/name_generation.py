@@ -15,4 +15,4 @@ def getRandomId():
     ID = ''
     for i in range(8):
         ID += str(random.randint(0,9))
-    return str(random.randint())
+    return ID

@@ -41,12 +41,13 @@ def listener(file, q):
     data = None
     with open(file, 'r') as f:
         data = json.load(f)
-    with open(file, 'w') as f:
-        while 1:
-            m = q.get()
-            if m == "kill":
-                break
-            data[str(m)] = True
+    
+    while 1:
+        m = q.get()
+        if m == "kill":
+            break
+        data[str(m)] = True
+        with open(file, 'w') as f:
             json.dump(data, f)
             f.flush()
             
@@ -68,6 +69,7 @@ if __name__=="__main__":
         random.seed(seed)
         numpy.random.seed(random.randint(0, 2**32 - 1))
         globs, runs = readInFile(infile)
+        print("Finished setup")
         
         data = None
         pth = os.path.join(logging, str(seed) + ".json")
@@ -91,11 +93,13 @@ if __name__=="__main__":
                 data[key] = False
             if not data[key]:
                 toRun.append((sd,*runs[i]))
+                
         with open(pth,"w") as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=6)
             f.flush()
         
         cores = globs.get("num_cores")
+        print("running")
         
         if cores < 3:
             q = Outputer(pth)
@@ -108,7 +112,7 @@ if __name__=="__main__":
         
             #put listener to work first
             watcher = pool.apply_async(listener, (pth,q))
-        
+            
             #fire off workers
             jobs = []
             for _seed, par, ap, al in toRun:

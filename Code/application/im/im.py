@@ -6,8 +6,8 @@ Created on Sat Mar 26 14:28:53 2022
 """
 
 from application.application import Application
-from application.application.im.network.network import buildNetwork
-from application.application.im.propogation.propogation import Propogator
+from application.im.network.network import buildNetwork
+from application.im.propogation.propogation import Propogator
 import networkx as nx
 import os.path
 

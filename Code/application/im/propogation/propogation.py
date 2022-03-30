@@ -28,7 +28,7 @@ class Propogator:
           self.DG = copy.deepcopy(G)
           
         if self.propType == "independent_cascade":
-            w = params.get("unform_weight")
+            w = params.get("uniform_weight")
             for e in self.DG.edges():
               if 'act_prob' not in self.DG[e[0]][e[1]]:
                 self.DG[e[0]][e[1]]['act_prob'] = w
@@ -133,7 +133,7 @@ class Propogator:
                 if nb in A or (cascade and ((s, nb) in tried_edges or (s, nb) in cur_tried_edges)):
                     continue
                 
-                if self.isActivated(G, A, s, nb):
+                if self._isActivated(G, A, s, nb):
                     activated_nodes_of_this_round.add(nb)
                     cur_success_edges.add((s,nb))
                 cur_tried_edges.add((s, nb))

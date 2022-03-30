@@ -282,6 +282,9 @@ class BaseParamSet:
     def getName(self):
         return self.name
     
+    def reset(self):
+        self.loader.reset()
+    
     
     
 class ParamSet:

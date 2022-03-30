@@ -4,7 +4,7 @@ Created on Sat Mar 26 18:41:32 2022
 
 @author: Tim Schommer
 """
-from algorith.algorithm import Algorithm
+from algorithm.algorithm import Algorithm
 from application.application import Application
 from parameters.parameterization import ParamSet
 from Utilities.name_generation import getTimestamp, getRandomId
@@ -50,7 +50,7 @@ class Etcg(Algorithm):
             for i in range(len(tbd_set)):
                 chosen_arms = accept_set+[tbd_set[i]]
                 for count in range(m):
-                    reward_chosen_arms = self._reward(self,chosen_arms)
+                    reward_chosen_arms = self._reward(app, chosen_arms)
                     tbd_set_rewards[i] += reward_chosen_arms
                     
                     selected_action_etcg.append(chosen_arms)
@@ -85,7 +85,7 @@ class Etcg(Algorithm):
         fullpath = path + "results.json"
         
         with open(fullpath, "w") as f:
-            json.dump(output, f)
+            json.dump(output, f, indent=6)
             
         return selected_action_etcg, obs_influences_etcg
         
