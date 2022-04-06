@@ -1,0 +1,44 @@
+{
+      "unique_globals": true,
+      "global_vars": {
+            "num_runs": 3
+      },
+      "applications": [
+            {
+                  "name": "im",
+                  "unique": false,
+                  "params": {
+                        "weighting_method": "un",
+                        "uniform_weight": 0.2
+                  },
+                  "uses": [
+                        0
+                  ]
+            },
+            {
+                  "name": "im",
+                  "unique": false,
+                  "params": {
+                        "weighting_method": "un",
+                        "uniform_weight": 0.1
+                  },
+                  "uses": [
+                        1
+                  ]
+            }
+      ],
+      "algorithms": [
+            {
+                  "name": "etcg",
+                  "unique": false,
+                  "params": {
+                        "seed_set_size": 6,
+                        "time_horizon": 10000
+                  },
+                  "uses": [
+                        "0-1"
+                  ]
+            }
+      ],
+      "num_experiments": 2
+}

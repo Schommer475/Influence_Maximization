@@ -20,3 +20,11 @@ class Application(ABC):
     @abstractmethod
     def listOptions(self):
         ...
+        
+    @abstractmethod
+    def refresh(self):
+        ...
+        
+    def newRun(self, reInit: bool):
+        if reInit:
+            self.refresh()

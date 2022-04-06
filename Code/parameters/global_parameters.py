@@ -121,15 +121,24 @@ def available_cpu_count():
     raise Exception('Can not determine number of CPUs on this system') 
     
 num_cores = available_cpu_count()
+num_runs = 1
+refresh = True
+
 
 def validateSolo(g_params):
     if "num_cores" in g_params:
-        if type(g_params["num_cores"]) is not int:
-            raise ValueError("The number of cores to use must be an integer.")
+        if type(g_params["num_cores"]) is not int or g_params["num_cores"] < 1:
+            raise ValueError("The number of cores to use must be an integer greater than 0.")
         if g_params["num_cores"] > num_cores:
             g_params["num_cores"] = num_cores
     else:
         g_params["num_cores"] = num_cores
-
-def validateFull(data):
-    return
+    
+    if "num_runs" in g_params:
+        if type(g_params["num_runs"]) is not int or g_params["num_runs"] < 1:
+            raise ValueError("The number of runs to perform must be an integer greater than 1.")
+    if "refresh" in g_params:
+        if type(g_params["refresh"]) is not bool:
+            raise ValueError("The parameter 'refresh' must be a bool.")
+            
+    

@@ -82,7 +82,7 @@ def validateRange(item, upper, name):
              + name 
              +" is expected to be either an int or a string indicating a range.")
 
-def validateInputD(data, upperRange, name):
+def validateInputD(data, upperRange, name, useRanges=True):
     if "name" not in data:
         raise ValueError(name + " in input file must all have a non-empty string field called 'name'")
     if not type(data["name"]) is str:
@@ -90,21 +90,25 @@ def validateInputD(data, upperRange, name):
     if len(data["name"]) == 0:
         raise ValueError("The string field 'name' for each item in " + name +" must be non-empty.")
         
-    if "uses" not in data:
-        raise ValueError(name + " in input file must all have a non-empty list field called 'uses'")
-    if not type(data["uses"]) is list:
-        raise ValueError("The field 'uses' for each item in " + name +" must be a non-empty list.")
-    if len(data["uses"]) == 0:
-        raise ValueError("The list field 'uses' for each item in " + name +" must be non-empty.")
+    if useRanges:
+        if "uses" not in data:
+            raise ValueError(name + " in input file must all have a non-empty list field called 'uses'")
+        if not type(data["uses"]) is list:
+            raise ValueError("The field 'uses' for each item in " + name +" must be a non-empty list.")
+        if len(data["uses"]) == 0:
+            raise ValueError("The list field 'uses' for each item in " + name +" must be non-empty.")
+    else:
+        if "uses" in data:
+            raise ValueError("Generator files should not define the 'uses' field.")
         
     if "unique" not in data:
         data["unique"] = False
     if type(data["unique"]) is not bool:
         raise ValueError("The field 'unique' for each item in " + name +" must be a boolean.")
         
-    if "unique_instance" not in data:
+    if "unique_instance" not in data and useRanges:
         data["unique_instance"] = default_unique_instance or data["unique"]
-    if type(data["unique_instance"]) is not bool:
+    if useRanges and type(data["unique_instance"]) is not bool:
         raise ValueError("The field 'unique_instance' for each item in " + name +" must be a boolean.")
         
     if not "params" in data:
@@ -112,11 +116,20 @@ def validateInputD(data, upperRange, name):
     if not type(data["params"]) is dict:
         raise ValueError("The field 'params' for each item in " + name +" is expected to be a dictionary of parameters.")
         
-    data["ranges"] = []
-    for r in data["uses"]:
-        ret = validateRange(r, upperRange, name)
-        if ret is not None:
-            data["ranges"].append(ret)
+    if not useRanges:
+        dat = data["params"]
+        for key in dat:
+            val = dat[key]
+            if type(val) is not list:
+                raise ValueError("Every term within the params field for " + name +
+                                 " in an input generation file must be a list of values to use.")
+        
+    if useRanges:
+        data["ranges"] = []
+        for r in data["uses"]:
+            ret = validateRange(r, upperRange, name)
+            if ret is not None:
+                data["ranges"].append(ret)
     
 
 def validateCount(total, lst, name):
@@ -139,19 +152,13 @@ def validateCount(total, lst, name):
         raise ValueError("Listings for " + name + 
              " parameters must cover the full range from 0 to " 
              + str(total - 1) + " Missing indices are: " + str(empty))
-
-def getAndValidateInput(fileName):
-    if not (os.path.exists(fileName) and os.path.isfile(fileName)):
-        raise IOError("File " + str(fileName) + " does not exist or is not a file.")
-    inputs = None
-    with open(fileName) as f:
-        inputs = json.load(f)
         
-    if not "num_experiments" in inputs:
+def validateInput(inputs, useRanges=True):
+    if not "num_experiments" in inputs and useRanges:
         raise ValueError("Input file expected to have a field 'num_experiments' with a positive integer.")
-    if not type(inputs["num_experiments"]) is int:
+    if useRanges and not type(inputs["num_experiments"]) is int:
         raise ValueError("The field 'num_experiments' is expected to be a positive integer.")
-    if inputs["num_experiments"] < 1:
+    if useRanges and inputs["num_experiments"] < 1:
         raise ValueError("'num_experiments' must be at least 1.")
         
     if not "global_vars" in inputs:
@@ -186,10 +193,23 @@ def getAndValidateInput(fileName):
             
     for i in ["applications", "algorithms"]:
         for o in inputs[i]:
-            validateInputD(o, inputs["num_experiments"], i)
-        validateCount(inputs["num_experiments"], inputs[i], i)
+            if useRanges:
+                validateInputD(o, inputs["num_experiments"], i, useRanges)
+            else:
+                validateInputD(o, 0, i, useRanges)
+        if useRanges:
+            validateCount(inputs["num_experiments"], inputs[i], i)
         
     return inputs
+
+def getAndValidateInput(fileName):
+    if not (os.path.exists(fileName) and os.path.isfile(fileName)):
+        raise IOError("File " + str(fileName) + " does not exist or is not a file.")
+    inputs = None
+    with open(fileName) as f:
+        inputs = json.load(f)
+        
+    return validateInput(inputs)
 
 def listModules(data):
     ret = {"params":[], "builders":[]}
@@ -351,7 +371,7 @@ def fillOut(data,modules, backup):
     
     if data["unique_globals"]:
         globalValues = [BaseParamSet("",copy.deepcopy(data["global_vars"])
-                     ,backup) for _ in range(data["num_experiments"])]
+                     ,backup["globals"]) for _ in range(data["num_experiments"])]
         for i in range(data["num_experiments"]):
             indices[i] = {"globals":i}
     else:

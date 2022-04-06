@@ -67,7 +67,8 @@ class Propogator:
                 if random.uniform() < spontaneous_prob[m]:
                     spontaneously_infected.append(nodes[m])
                         
-            
+        #ImLinUCB used to use all of this information, so it is still supported, 
+        #no longer returned here
         layers, tried, successes = self.basePropogate(list(set(spontaneously_infected + seeds)))  
             
         chosen = []
@@ -75,7 +76,8 @@ class Propogator:
             chosen = chosen + layers[k]
             influence = influence + len(layers[k])
     
-        return influence, chosen, tried, successes, layers
+        #divide influence by number of nodes to normalize
+        return influence / self.DG.number_of_nodes()
     
     def basePropogate(self, seeds):
         for s in seeds:

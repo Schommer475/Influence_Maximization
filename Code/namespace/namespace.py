@@ -109,7 +109,7 @@ def getAndValidateJoint(application, algorithm):
     if data is None:
         data = {
             "use_timestamp":False,
-            "use_randID":False,
+            "use_randID":True,
             "sep_after":False
         }
         
@@ -1292,6 +1292,18 @@ def removeParam_Namespace(path, inputs, index):
     del inputs["separators"][index]
     with open(path, "w") as f:
         json.dump(inputs, f, indent=6)
+        
+        
+def idIndex(data, val):
+    if val == "<START>":
+        return 0
+    elif val == "<END>":
+        return len(data)
+    else:
+        for i in range(1,len(data)):
+            if val == data[i]:
+                return i
+        raise AttributeError(val + " is not a recognized parameter.")
 
 
 def invert():
@@ -1363,6 +1375,7 @@ def toggleBreak(section, identifier, index):
 
 def swap(section, identifier, index1, index2):
     data = getAndValidateInput(section, identifier)
+    
     if index1 <= 0 or index1 >= len(data["headers"]):
         raise ValueError("Index 1 out of bounds")
     if index2 <= 0 or index2 >= len(data["headers"]):

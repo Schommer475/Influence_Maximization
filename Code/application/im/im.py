@@ -6,7 +6,7 @@ Created on Sat Mar 26 14:28:53 2022
 """
 
 from application.application import Application
-from application.im.network.network import buildNetwork
+from application.im.network.network import buildNetwork, weightNetwork
 from application.im.propogation.propogation import Propogator
 import networkx as nx
 import os.path
@@ -25,6 +25,12 @@ class Im(Application):
     
     def listOptions(self):
         return list(self.network.nodes())
+    
+    def refresh(self):
+        method = self.params.get("weighting_method")
+        if method == "rn" or method == "tv":
+            self.network = weightNetwork(self.params, self.network)
+            self.params.reset()
     
     def toDataframeEdges(self):
         return nx.to_pandas_edgelist(self.network)

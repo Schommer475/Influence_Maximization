@@ -33,7 +33,7 @@ default_threshold = 0.5
 
 
 def validateSolo(data):
-    p = data
+    p = data["params"]
     if "use_florentine" in p:
         val = p["use_florentine"]
         if type(val) is not bool:
@@ -120,5 +120,8 @@ def validateSolo(data):
          if val < 0 or val > 1:
              raise AttributeError("The field 'default_threshold' must be a number " 
                   "between 0 and 1 inclusive.")
+             
+             
+    
         
         

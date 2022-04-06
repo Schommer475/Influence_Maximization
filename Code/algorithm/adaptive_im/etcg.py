@@ -7,10 +7,9 @@ Created on Sat Mar 26 18:41:32 2022
 from algorithm.algorithm import Algorithm
 from application.application import Application
 from parameters.parameterization import ParamSet
-from Utilities.name_generation import getTimestamp, getRandomId
 import math
 import numpy as np
-import json
+import pickle
 
 class Etcg(Algorithm):
     def __init__(self, data):
@@ -20,11 +19,9 @@ class Etcg(Algorithm):
     
         
     def _reward(self, app, choices):
-        inf, *_ = app.getReward(choices)
-        return inf / app.getOptionCount()
+        return app.getReward(choices)
     
     def _calcM(self, N):
-        #TODO still using magic numbers, see if we can get rid of them
         T = self.T
         K = self.K
         numerator = T*math.sqrt(2*math.log(T))
@@ -34,7 +31,10 @@ class Etcg(Algorithm):
         m = math.floor(after_power)
         return m
     
-    def run(self, app: Application, pset: ParamSet):
+    def refresh(self):
+        ...
+    
+    def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
         N = app.getOptionCount()
         
         m = self._calcM(N)
@@ -78,16 +78,17 @@ class Etcg(Algorithm):
             opt_inf += infl
             
         output["avg_opt_inf"] = opt_inf / (self.T - time_step)
-        output["selected_actions"] = selected_action_etcg
-        output["observed_influences"] = obs_influences_etcg
         
-        path = pset.getPath(getTimestamp(), getRandomId())
-        fullpath = path + "results.json"
+        path = pset.getPath(timestamp, randId)
+        fullpath = path + "optimalInfo.pkl"
         
-        with open(fullpath, "w") as f:
-            json.dump(output, f, indent=6)
+        with open(fullpath, "wb") as f:
+            pickle.dump(output, f)
             
-        return selected_action_etcg, obs_influences_etcg
+        ret = dict()
+        ret["selected_actions"] = selected_action_etcg
+        ret["observed_influences"] = obs_influences_etcg
+        return ret
         
 
 def createInstance(data):

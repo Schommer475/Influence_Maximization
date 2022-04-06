@@ -8,7 +8,8 @@ Created on Sat Mar 26 14:33:43 2022
 seed_set_size = 4
 time_horizon = 10000
 
-def validateSolo(data):
+def validateSolo(dat):
+    data = dat["params"]
     if "seed_set_size" in data:
         val = data["seed_set_size"]
         if type(val) is not int or val < 1:
@@ -20,3 +21,7 @@ def validateSolo(data):
         if type(val) is not int or val < 1:
             raise AttributeError("The field 'time_horizon' must be an"
                                 " integer with value at least 1")
+            
+             
+    
+    

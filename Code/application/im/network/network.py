@@ -9,24 +9,8 @@ import pickle
 import random
 import pandas as pd
 
-def buildNetwork(params):
-    network = None
-    if params.get("use_florentine"):
-        network = nx.florentine_families_graph()
-        network = network.to_directed()
-    else:
-        network = nx.read_edgelist(params.get("network_file"),create_using=nx.DiGraph(), nodetype = int)
-        with open(params.get("community_file"), 'rb') as f:
-            part = pickle.load(f)
-        #This part is in all the examples but doesn't appear to do anything
-        #value = [part.get(node) for node in network.nodes()]
-        nodes_subset = [key for key,value in part.items() if value in params.get("kept_values")]
-        for outlier in params.get("outliers"):
-            nodes_subset.remove(outlier)
-            
-        network = nx.subgraph(network, nodes_subset).copy()
-        
-    network = nx.convert_node_labels_to_integers(network,first_label=0)
+def weightNetwork(params, network):
+    print("doing weighting")
     method = params.get("weighting_method")
     if (method == "rn"):
         for edge in network.edges():
@@ -53,5 +37,26 @@ def buildNetwork(params):
       
       for i in range(len(edge_list)):
              network[edge_list['from'][i]][edge_list['to'][i]]['act_prob'] = edge_list['act_prob'][i]
-             
+    
+    return network
+    
+def buildNetwork(params):
+    network = None
+    if params.get("use_florentine"):
+        network = nx.florentine_families_graph()
+        network = network.to_directed()
+    else:
+        network = nx.read_edgelist(params.get("network_file"),create_using=nx.DiGraph(), nodetype = int)
+        with open(params.get("community_file"), 'rb') as f:
+            part = pickle.load(f)
+        #This part is in all the examples but doesn't appear to do anything
+        #value = [part.get(node) for node in network.nodes()]
+        nodes_subset = [key for key,value in part.items() if value in params.get("kept_values")]
+        for outlier in params.get("outliers"):
+            nodes_subset.remove(outlier)
+            
+        network = nx.subgraph(network, nodes_subset).copy()
+        
+    network = nx.convert_node_labels_to_integers(network,first_label=0)
+    network = weightNetwork(params, network)
     return network

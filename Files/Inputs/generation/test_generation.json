@@ -1,0 +1,10 @@
+{
+	"unique_globals": true,
+	"global_vars":{"num_runs":3},
+	"applications":[
+	{"name":"im", "params":{"weighting_method":["un","tv"],"uniform_weight":[0.2,0.1]}}
+	],
+"algorithms":[
+	{"name":"etcg","unique":false, "params":{"seed_set_size":[4,6],"time_horizon":[10000,100000]}}
+	]
+}

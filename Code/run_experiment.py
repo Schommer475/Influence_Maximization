@@ -10,8 +10,10 @@ import json
 import sys
 from parameters.parameterization import readInFile
 from Utilities.global_names import logging
+from Utilities.name_generation import getTimestamp, getRandomId
 import os.path
 import multiprocessing as mp
+import pickle
 
 class Outputer:
     def __init__(self, fname):
@@ -31,10 +33,23 @@ class Outputer:
             
     
     
-def worker(seed, queue, params, application, algorithm):
+def worker(seed, queue, params, application, algorithm, refresh):
     random.seed(seed)
     numpy.random.seed(random.randint(0, 2**32 - 1))
-    algorithm.run(application,params)
+    r = getRandomId()
+    ts = getTimestamp()
+    application.newRun(refresh)
+    algorithm.newRun(refresh)
+    ret = algorithm.run(application,params, ts, r)
+    if ret is None:
+        ret = dict()
+    output = {"params":params,"results":ret}
+    pth = params.getPath(ts,r)
+    fullpath = pth + "results.pkl"
+    params.reset()
+        
+    with open(fullpath, "wb") as f:
+        pickle.dump(output, f)
     queue.put(seed)
     
 def listener(file, q):
@@ -83,28 +98,32 @@ if __name__=="__main__":
                 
         toRun = []
         newKeys = set()
+        num_runs = globs.get("num_runs")
         for i in range(len(runs)):
-            sd = random.randint(0, 2**32 - 1)
-            while sd in newKeys:
+            for j in range(num_runs):
                 sd = random.randint(0, 2**32 - 1)
-            newKeys.add(sd)
-            key = str(sd)
-            if key not in data:
-                data[key] = False
-            if not data[key]:
-                toRun.append((sd,*runs[i]))
+                while sd in newKeys:
+                    sd = random.randint(0, 2**32 - 1)
+                newKeys.add(sd)
+                key = str(sd)
+                if key not in data:
+                    data[key] = False
+                if not data[key]:
+                    toRun.append((sd,*runs[i]))
                 
         with open(pth,"w") as f:
             json.dump(data, f, indent=6)
             f.flush()
         
         cores = globs.get("num_cores")
+        doRefresh = globs.get("refresh")
+        globs.reset()
         print("running")
         
         if cores < 3:
             q = Outputer(pth)
             for _seed, par, ap, al in toRun:
-                worker(_seed, q, par, ap, al)
+                worker(_seed, q, par, ap, al, doRefresh)
         else:
             manager = mp.Manager()
             q = manager.Queue()    
@@ -116,7 +135,7 @@ if __name__=="__main__":
             #fire off workers
             jobs = []
             for _seed, par, ap, al in toRun:
-                job = pool.apply_async(worker, (_seed, q, par, ap, al))
+                job = pool.apply_async(worker, (_seed, q, par, ap, al, doRefresh))
                 jobs.append(job)
         
             # collect results from the workers through the pool result queue

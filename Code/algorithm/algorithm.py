@@ -12,5 +12,13 @@ from parameters.parameterization import ParamSet
 class Algorithm(ABC):
     
     @abstractmethod
-    def run(self, app: Application, pset: ParamSet):
+    def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
         ...
+        
+    @abstractmethod
+    def refresh(self):
+        ...
+        
+    def newRun(self, reInit: bool):
+        if reInit:
+            self.refresh()
