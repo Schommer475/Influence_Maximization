@@ -34,6 +34,17 @@ class ModuleHandler:
     def reset(self):
         self.initialized = False
         self.module = None
+        
+    def toDict(self):
+        return {
+            "package":self.package,
+            "name":self.name,
+            "errmsg1":self.errmsg1,
+            "errmsg2":self.errmsg2
+            }
+    
+    def fromDict(data):
+        return ModuleHandler(data["package"], data["name"], data["errmsg1"], data["errmsg2"])
             
 
 
@@ -304,6 +315,17 @@ class BaseParamSet:
     
     def reset(self):
         self.loader.reset()
+        
+    def toDict(self):
+        return {
+            "params":self.params,
+            "name":self.name,
+            "loader":self.loader.toDict()
+            }
+    
+    def fromDict(data):
+        return BaseParamSet(data["name"], data["params"], 
+                            ModuleHandler.fromDict(data["loader"]))
     
     
     
@@ -356,6 +378,18 @@ class ParamSet:
     
     def getPath(self, timestamp, randId):
         return namespace.getFilePath(self, timestamp, randId)
+    
+    def toDict(self):
+        return {
+            "globalParams":self.globalParams.toDict(),
+            "applicationParams":self.applicationParams.toDict(),
+            "algorithmParams":self.algorithmParams.toDict()
+            }
+    
+    def fromDict(data):
+        return ParamSet(BaseParamSet.fromDict(data["globalParams"]), 
+                        BaseParamSet.fromDict(data["applicationParams"]), 
+                        BaseParamSet.fromDict(data["algorithmParams"]))
     
     
 def firstValidation(data, loadedParams):

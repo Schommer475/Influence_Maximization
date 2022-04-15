@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from Utilities.global_names import global_namespace, application_namespace,\
-    algorithm_namespace, joint_namespace, temp_dir
-from Utilities.program_vars import applications_index, algorithms_index
+    algorithm_namespace, joint_namespace, temp_dir, registered_namespace
+from Utilities.program_vars import applications_index, algorithms_index, joint_index
 from parameters.parameter_check import checkParamExistence as checkParams
     
 import json
@@ -36,8 +36,7 @@ data = None
 def getAppFirst():
     return app_first
     
-    
-def getAndValidateInput(section, identifier):
+def getInput(section, identifier):
     data = None
     expected_header = "-" + identifier
     path = identifier + ".json"
@@ -59,6 +58,17 @@ def getAndValidateInput(section, identifier):
             "headers":[expected_header],
             "separators":[False]
         }
+    return data
+    
+def getAndValidateInput(section, identifier):
+    data = getInput(section, identifier)
+    expected_header = "-" + identifier
+    if section == applications_index:
+        expected_header = "app" + expected_header
+    elif section == algorithms_index:
+        expected_header = "alg" + expected_header
+    else:
+        raise ValueError("Invalid section value")
         
     if not "headers" in data:
         raise ValueError("Files describing pathing must have a string array called 'headers'")
@@ -97,8 +107,7 @@ def getAndValidateInput(section, identifier):
         
     return data
         
-
-def getAndValidateJoint(application, algorithm):
+def getJoint(application, algorithm):
     path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
     data = None
     
@@ -112,6 +121,11 @@ def getAndValidateJoint(application, algorithm):
             "use_randID":True,
             "sep_after":False
         }
+    return data
+
+def getAndValidateJoint(application, algorithm):
+    data = getJoint(application, algorithm)
+    
         
     if not "use_timestamp" in data:
         raise ValueError("Files describing pathing for application-algorithm "
@@ -1304,6 +1318,71 @@ def idIndex(data, val):
             if val == data[i]:
                 return i
         raise AttributeError(val + " is not a recognized parameter.")
+        
+        
+def checkInt(val):
+    if val[0] in ('-', '+'):
+        return val[1:].isdigit()
+    return val.isdigit()
+
+def listAll():
+    data = None
+    if os.path.exists(registered_namespace):
+        with open(registered_namespace, "r") as f:
+            data = json.load(f)
+            
+    if data is None:
+        data = {
+            "applications":[],
+            "algorithms":[]
+        }
+    if not "applications" in data:
+        raise ValueError("The registered items file must have a list of applications.")
+    if not type(data["applications"]) is list:
+        raise ValueError("The variable 'applications' must be a list of strings")
+    for h in data["applications"]:
+        if not type(h) is str:
+            raise ValueError("Every entry in the list 'applications' must be a string")
+            
+    if not "algorithms" in data:
+        raise ValueError("The registered items file must have a list of algorithms.")
+    if not type(data["algorithms"]) is list:
+        raise ValueError("The variable 'algorithms' must be a list of strings")
+    for h in data["algorithms"]:
+        if not type(h) is str:
+            raise ValueError("Every entry in the list 'algorithms' must be a string")
+    return data
+
+def getAll():
+    data = listAll()
+    data["applications"]=set(data["applications"])
+    data["algorithms"]=set(data["algorithms"])
+    return data
+
+def register(section, identifier):
+    i = None
+    if section == applications_index:
+        i = "applications"
+    elif section == algorithms_index:
+        i = "algorithms"
+    else:
+        raise ValueError("Invalid section value")
+        
+    data = listAll()
+        
+    if identifier not in data[i]:
+        data[i].append(identifier)
+
+    with open(registered_namespace, "w") as f:
+        json.dump(data, f)
+    
+def get(section, identifier1, identifier2=None):
+    data = None
+    if section == joint_index:
+        data = getJoint(identifier1, identifier2)
+    else:
+        data = getInput(section, identifier1)
+    return data
 
 
 def invert():
@@ -1324,46 +1403,124 @@ def invert():
         
     invert_File(basePath)
     invert_Namespace(output_path, data)
+    
+def getListing(application, algorithm, usage, fixedMode=False, fixedVal=True):
+    applications = [application]
+    algorithms = [algorithm]
+    allV = None
+    if application == "-all" or algorithm == "-all":
+        out = "About to " + usage
+        if fixedMode:
+            out += " to " + str(fixedVal)
+        if application == "-all" and algorithm == "-all":
+            out += " for all application-algorithm pairs"
+        elif application == "-all":
+            out += " for all applications paired with the " + algorithm + " algorithm."
+        else:
+            out += " for all algorithms paired with the " + application + " application."
+        out += " Do you wish to proceed? (y/n)\n"
+        if input(out) == "y":
+            allV = listAll()
+            if application == "-all":
+                applications = [
+                    (a, getAndValidateInput(applications_index, a))
+                    for a in allV["applications"]]
+            else:
+                applications = [(application,
+                       getAndValidateInput(applications_index, application))]
+                
+            if algorithm == "-all":
+                algorithms = [
+                    (a, getAndValidateInput(algorithms_index, a))
+                    for a in allV["algorithms"]]
+            else:
+                algorithms = [(algorithm,
+                       getAndValidateInput(algorithms_index, algorithm))]
+                
+            return (True, applications, algorithms)
+        else:
+            return (False, None, None)
+    else:
+        return (True, [(application,
+                       getAndValidateInput(applications_index, application))],
+                    [(algorithm, 
+                    getAndValidateInput(algorithms_index, algorithm))])
 
 def toggleTimestamp(application, algorithm, 
-    default="0000-00-00-00-00-00"):
+    default="0000-00-00-00-00-00", fixedMode=False, fixedVal=True):
     if default is None or type(default) is not str:
         raise ValueError("default must be an string specifying a timestamp in the format yyyy-MM-dd-hh-mm-ss")
-    appData = getAndValidateInput(applications_index, application)
-    algData = getAndValidateInput(algorithms_index, algorithm)
-    joint = getAndValidateJoint(application, algorithm)
-    basepath = temp_dir
-    output_path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
-    toggleTimestamp_File(basepath, appData, algData, joint, default)
-    toggleTimestamp_Namespace(output_path, joint)
+        
+    doRun, applications, algorithms = getListing(application, algorithm, 
+                                    "toggle timestamp usage",
+                                     fixedMode=fixedMode, fixedVal=fixedVal)
+    if not doRun:
+        print("Canceling.")
+        return
+    else:
+        for application, appData in applications:
+            for algorithm, algData in algorithms:
+                joint = getAndValidateJoint(application, algorithm)
+                basepath = temp_dir
+                output_path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
+                if (not fixedMode) or joint["use_timestamp"] != fixedVal:
+                    toggleTimestamp_File(basepath, appData, algData, joint, default)
+                    toggleTimestamp_Namespace(output_path, joint)
+    
 
 def toggleRandID(application, algorithm, 
-    default="00000000"):
+    default="00000000", fixedMode=False, fixedVal=True):
     if default is None or type(default) is not str:
         raise ValueError("default must be an string specifying an eight digit random id")
         
-    appData = getAndValidateInput(applications_index, application)
-    algData = getAndValidateInput(algorithms_index, algorithm)
-    joint = getAndValidateJoint(application, algorithm)
-    basepath = temp_dir
-    output_path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
-    toggleRandID_File(basepath, appData, algData, joint, default)
-    toggleRandID_Namespace(output_path, joint)
-
-def toggleTimeRandBreak(application, algorithm):
-    joint = getAndValidateJoint(application, algorithm)
-    output_path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
-    if not (joint["use_timestamp"] or joint["use_randID"]):
-        toggleTimeRandBreak_Namespace(output_path, joint)
+    doRun, applications, algorithms = getListing(application, algorithm, 
+                                    "toggle random id usage", 
+                                     fixedMode=fixedMode, fixedVal=fixedVal)
+    if not doRun:
+        print("Canceling.")
+        return
     else:
-        appData = getAndValidateInput(applications_index, application)
-        algData = getAndValidateInput(algorithms_index, algorithm)
-        basepath = temp_dir
-        toggleTimeRandBreak_File(basepath, appData, algData, joint)
-        toggleTimeRandBreak_Namespace(output_path, joint)
+        for application, appData in applications:
+            for algorithm, algData in algorithms:
+                joint = getAndValidateJoint(application, algorithm)
+                basepath = temp_dir
+                output_path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
+                if (not fixedMode) or joint["use_randID"] != fixedVal:
+                    toggleRandID_File(basepath, appData, algData, joint, default)
+                    toggleRandID_Namespace(output_path, joint)
+
+def toggleTimeRandBreak(application, algorithm, fixedMode=False, fixedVal=True):
+    
+    doRun, applications, algorithms = getListing(application, algorithm, 
+                                    "toggle the usage of path separators after"
+                                    " timestamps and random ids", 
+                                     fixedMode=fixedMode, fixedVal=fixedVal)
+    if not doRun:
+        print("Canceling.")
+        return
+    else:
+        for application, appData in applications:
+            for algorithm, algData in algorithms:
+                joint = getAndValidateJoint(application, algorithm)
+                basepath = temp_dir
+                output_path = os.path.join(joint_namespace, application + "_" + algorithm + ".json")
+    
+            if (not fixedMode) or joint["sep_after"] != fixedVal:
+                if not (joint["use_timestamp"] or joint["use_randID"]):
+                    toggleTimeRandBreak_Namespace(output_path, joint)
+                else:
+                    appData = getAndValidateInput(applications_index, application)
+                    algData = getAndValidateInput(algorithms_index, algorithm)
+                    basepath = temp_dir
+                    toggleTimeRandBreak_File(basepath, appData, algData, joint)
+                    toggleTimeRandBreak_Namespace(output_path, joint)
 
 def toggleBreak(section, identifier, index):
     data = getAndValidateInput(section, identifier)
+    if checkInt(index):
+        index = int(index)
+    else:
+        index = idIndex(data, index)
     basepath = temp_dir
     output_path = identifier + ".json"
     if section == applications_index:
@@ -1376,6 +1533,16 @@ def toggleBreak(section, identifier, index):
 def swap(section, identifier, index1, index2):
     data = getAndValidateInput(section, identifier)
     
+    if checkInt(index1):
+        index1 = int(index1)
+    else:
+        index1 = idIndex(data, index1)
+        
+    if checkInt(index2):
+        index2 = int(index2)
+    else:
+        index2 = idIndex(data, index2)
+        
     if index1 <= 0 or index1 >= len(data["headers"]):
         raise ValueError("Index 1 out of bounds")
     if index2 <= 0 or index2 >= len(data["headers"]):
@@ -1393,6 +1560,11 @@ def swap(section, identifier, index1, index2):
 
 def addParam(section, identifier, param, useSep, index, default):
     data = getAndValidateInput(section, identifier)
+    if checkInt(index):
+        index = int(index)
+    else:
+        index = idIndex(data, index)
+        
     if index <= 0 or index > len(data["headers"]):
         raise ValueError("Index out of bounds")
         
@@ -1418,6 +1590,12 @@ def addParam(section, identifier, param, useSep, index, default):
 
 def removeParam(section, identifier, index, default):
     data = getAndValidateInput(section, identifier)
+    
+    if checkInt(index):
+        index = int(index)
+    else:
+        index = idIndex(data, index)
+        
     if index <= 0 or index > len(data["headers"]):
         raise ValueError("Index out of bounds")
         
