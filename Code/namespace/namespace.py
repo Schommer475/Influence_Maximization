@@ -1353,11 +1353,6 @@ def listAll():
             raise ValueError("Every entry in the list 'algorithms' must be a string")
     return data
 
-def getAll():
-    data = listAll()
-    data["applications"]=set(data["applications"])
-    data["algorithms"]=set(data["algorithms"])
-    return data
 
 def register(section, identifier):
     i = None
@@ -1368,10 +1363,31 @@ def register(section, identifier):
     else:
         raise ValueError("Invalid section value")
         
+    if identifier == "-all":
+        raise ValueError("Cannot register '-all'")
     data = listAll()
         
     if identifier not in data[i]:
         data[i].append(identifier)
+
+    with open(registered_namespace, "w") as f:
+        json.dump(data, f)
+        
+def deregister(section, identifier):
+    i = None
+    if section == applications_index:
+        i = "applications"
+    elif section == algorithms_index:
+        i = "algorithms"
+    else:
+        raise ValueError("Invalid section value")
+        
+    if identifier == "-all":
+        raise ValueError("Cannot register '-all'")
+    data = listAll()
+        
+    if identifier in data[i]:
+        data[i].remove(identifier)
 
     with open(registered_namespace, "w") as f:
         json.dump(data, f)
@@ -1384,8 +1400,85 @@ def get(section, identifier1, identifier2=None):
         data = getInput(section, identifier1)
     return data
 
+def printIndividual(application, algorithm):
+    if application is not None and algorithm is not None:
+        print(application + "   -   " + algorithm + ":")
+        try:
+            data = getAndValidateJoint(application, algorithm)
+            ret = ""
+            if data["use_timestamp"]:
+                ret += "Timestamp "
+                if data["use_randID"]:
+                    ret += "_ "
+                    
+            if data["use_randID"]:
+                ret += "Random ID "
+            elif not data["use_timestamp"]:
+                ret += "Nothing "
+                
+            if data["sep_after"]:
+                ret += "/"
+            else:
+                ret += "_"
+                
+            print(ret)
+        except Exception as e:
+            print("Error: " + str(e))
+    else:
+        section = None
+        name = None
+        if application is not None:
+            section = applications_index
+            name = application
+        else:
+            section = algorithms_index
+            name = algorithm
+            
+        print(name + ":")
+        try:
+            data = getAndValidateInput(section, name)
+            ret = "<START> "
+            if data["separators"][0]:
+                ret += "/ "
+            else:
+                ret += "_ "
+                
+            for i in range(1, len(data["headers"])):
+                ret += data["headers"][i] + " "
+                if data["separators"][i]:
+                    ret += "/ "
+                else:
+                    ret += "_ "
+                    
+            ret += "<END>"
+            print(ret)
+        except Exception as e:
+            print("Error: " + str(e))
+    print()
 
-def invert():
+def printList(application, algorithm):
+    if ((application is not None and application == "-all")
+        or (algorithm is not None and algorithm == "-all")):
+        items = listAll()
+        if application is None:
+            for a in items["algorithms"]:
+                printIndividual(None, a)
+        elif algorithm is None:
+            for a in items["applications"]:
+                printIndividual(a, None)
+        else:
+            for ap in items["applications"]:
+                for al in items["algorithms"]:
+                    printIndividual(ap, al)
+    else:
+        if application is None:
+            printIndividual(None, algorithm)
+        elif algorithm is None:
+            printIndividual(application, None)
+        else:
+            printIndividual(application, algorithm)
+    
+def invert(fixedMode=False, fixedVal=True):
     basePath = temp_dir
     
     output_path = global_namespace
@@ -1401,6 +1494,8 @@ def invert():
     if "app_first" not in data:
         raise ValueError("The global namespace file must have a bool variable 'app_first'")
         
+    if fixedMode and data["app_first"] == fixedVal:
+        return
     invert_File(basePath)
     invert_Namespace(output_path, data)
     
@@ -1515,20 +1610,21 @@ def toggleTimeRandBreak(application, algorithm, fixedMode=False, fixedVal=True):
                     toggleTimeRandBreak_File(basepath, appData, algData, joint)
                     toggleTimeRandBreak_Namespace(output_path, joint)
 
-def toggleBreak(section, identifier, index):
+def toggleBreak(section, identifier, index, fixedMode=False, FixedVal=False):
     data = getAndValidateInput(section, identifier)
     if checkInt(index):
         index = int(index)
     else:
         index = idIndex(data, index)
-    basepath = temp_dir
-    output_path = identifier + ".json"
-    if section == applications_index:
-        output_path = os.path.join(application_namespace, output_path)
-    else:
-        output_path = os.path.join(algorithm_namespace, output_path)
-    toggleBreak_File(basepath, section, index, data)
-    toggleBreak_Namespace(output_path, data, index)
+    if (not fixedMode) or (not data["separators"][index] == FixedVal):
+        basepath = temp_dir
+        output_path = identifier + ".json"
+        if section == applications_index:
+            output_path = os.path.join(application_namespace, output_path)
+        else:
+            output_path = os.path.join(algorithm_namespace, output_path)
+        toggleBreak_File(basepath, section, index, data)
+        toggleBreak_Namespace(output_path, data, index)
 
 def swap(section, identifier, index1, index2):
     data = getAndValidateInput(section, identifier)

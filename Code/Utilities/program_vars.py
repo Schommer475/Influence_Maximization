@@ -2,7 +2,7 @@
 """
 Created on Sun Feb  6 10:36:05 2022
 
-@author: raqua
+@author: Tim Schommer
 """
 
 globals_index = 0
