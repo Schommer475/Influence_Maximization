@@ -33,13 +33,12 @@ class Outputer:
             
     
     
-def worker(seed, queue, params, application, algorithm, refresh):
+def worker(seed, queue, expwrapper, refresh):
     random.seed(seed)
     numpy.random.seed(random.randint(0, 2**32 - 1))
     r = getRandomId()
     ts = getTimestamp()
-    application.newRun(refresh)
-    algorithm.newRun(refresh)
+    params, application, algorithm = expwrapper.get(refresh)
     ret = algorithm.run(application,params, ts, r)
     if ret is None:
         ret = dict()
@@ -109,7 +108,7 @@ if __name__=="__main__":
                 if key not in data:
                     data[key] = False
                 if not data[key]:
-                    toRun.append((sd,*runs[i]))
+                    toRun.append((sd, runs[i]))
                 
         with open(pth,"w") as f:
             json.dump(data, f, indent=6)
@@ -122,8 +121,8 @@ if __name__=="__main__":
         
         if cores < 3:
             q = Outputer(pth)
-            for _seed, par, ap, al in toRun:
-                worker(_seed, q, par, ap, al, doRefresh)
+            for _seed, exp in toRun:
+                worker(_seed, q, exp, doRefresh)
         else:
             manager = mp.Manager()
             q = manager.Queue()    
@@ -134,8 +133,8 @@ if __name__=="__main__":
             
             #fire off workers
             jobs = []
-            for _seed, par, ap, al in toRun:
-                job = pool.apply_async(worker, (_seed, q, par, ap, al, doRefresh))
+            for _seed, exp in toRun:
+                job = pool.apply_async(worker, (_seed, q, exp, doRefresh))
                 jobs.append(job)
         
             # collect results from the workers through the pool result queue

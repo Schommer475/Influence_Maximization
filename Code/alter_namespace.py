@@ -6,7 +6,7 @@ Created on Wed Apr 20 14:43:51 2022
 """
 import sys
 from sys import exit
-from namespace import namespace
+from namespace import manipulate_namespace as namespace
 from Utilities.program_vars import applications_index, algorithms_index, joint_index
 """
 Invert           fixed mode
@@ -446,12 +446,14 @@ def printUsage():
         +"                   3) After the final separator symbol, the symbol <END> is used.\n"
         +"               If printing information on application-algorithm pairs, each entry will begin with a line\n"
         +"               formatted: application_name   -   algorithm_name:\n"
-        +"               and be followed with one of the following (The value of 'sep' will be _ if the pair does\n"
+        +"               and be followed with one of the following (The value of 'sep' will be the value of\n"
+        +"               basic_separator in Utilities.program_vars ('_' at the time of writing) if the pair does\n"
         +"               not have a path separator following their timestamp/random ID and / if it does.):\n"
         +"                   1) (If the pair uses neither a timestamp nor a random ID) Nothing sep\n"
         +"                   2) (If the pair uses only a timestamp) Timestamp sep\n"
         +"                   3) (If the pair uses only a random ID) Random ID sep\n"
-        +"                   4) (If the pair uses both a timestamp and a random ID) Timestamp _ Random ID sep\n"
+        +"                   4) (If the pair uses both a timestamp and a random ID)\n"
+        +"                         Timestamp <basic_separator> Random ID sep\n"
         +"            Relevant arguments:\n"
         +"                *AT LEAST ONE OF:\n"
         +"                     --app=<value>\n"

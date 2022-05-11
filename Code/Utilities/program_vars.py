@@ -10,3 +10,5 @@ applications_index = 1
 algorithms_index = 2
 joint_index = 3
 default_unique_instance = False
+default_unique_params = False
+basic_separator = "_"

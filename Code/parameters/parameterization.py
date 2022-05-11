@@ -4,49 +4,12 @@ Created on Sat Feb  5 15:19:04 2022
 
 @author: Tim Schommer
 """
-from namespace import namespace
-from Utilities.program_vars import globals_index, applications_index, algorithms_index, \
-    default_unique_instance, joint_index
+from Utilities.program_vars import default_unique_instance, default_unique_params
 from importlib import import_module
 import os
 import json
-import copy
-
-
-    
-class ModuleHandler:
-    def __init__(self,package, name, errMessage1, errMessage2):
-        self.initialized = False
-        self.package = package
-        self.name = name
-        self.module = None
-        self.errmsg1 = errMessage1
-        self.errmsg2 = errMessage2
-        
-    def get(self, name):
-        if not self.initialized:
-            self.module = import_module(self.name,self.package)
-            self.initialized = True
-        if not hasattr(self.module, name):
-            raise ValueError(self.errmsg1 + name + self.errmsg2)
-        return getattr(self.module, name)
-    
-    def reset(self):
-        self.initialized = False
-        self.module = None
-        
-    def toDict(self):
-        return {
-            "package":self.package,
-            "name":self.name,
-            "errmsg1":self.errmsg1,
-            "errmsg2":self.errmsg2
-            }
-    
-    def fromDict(data):
-        return ModuleHandler(data["package"], data["name"], data["errmsg1"], data["errmsg2"])
-            
-
+from parameters.parameterization_classes import ModuleHandler, ParamWrapper, \
+    InstanceWrapper, ExperimentWrapper
 
 def validateRange(item, upper, name):
     if type(item) is int:
@@ -113,7 +76,7 @@ def validateInputD(data, upperRange, name, useRanges=True):
             raise ValueError("Generator files should not define the 'uses' field.")
         
     if "unique" not in data:
-        data["unique"] = False
+        data["unique"] = default_unique_params
     if type(data["unique"]) is not bool:
         raise ValueError("The field 'unique' for each item in " + name +" must be a boolean.")
         
@@ -293,104 +256,6 @@ def loadModules(data):
         
     return (loadedParams,ret,ret2)
 
-
-    
-class BaseParamSet:
-    def __init__(self, name, pars, loader):
-        self.params = pars
-        self.name = name
-        self.loader = loader
-        
-    def get(self,name: str):
-        if name in self.params:
-            return self.params[name]
-        else:
-            return self.loader.get(name)
-    
-    def setAttr(self,name: str, value):
-        self.params[name] = value
-        
-    def getName(self):
-        return self.name
-    
-    def reset(self):
-        self.loader.reset()
-        
-    def toDict(self):
-        return {
-            "params":self.params,
-            "name":self.name,
-            "loader":self.loader.toDict()
-            }
-    
-    def fromDict(data):
-        return BaseParamSet(data["name"], data["params"], 
-                            ModuleHandler.fromDict(data["loader"]))
-    
-    
-    
-class ParamSet:
-    def __init__(self, globalPars, appPars, algPars):
-        self.globalParams = globalPars
-        self.applicationParams = appPars
-        self.algorithmParams = algPars
-        self.jointParams = None
-        
-    def get(self,section: int,name: str):
-        if section == globals_index:
-            return self.globalParams.get(name)
-        elif section == applications_index:
-            return self.applicationParams.get(name)
-        elif section == algorithms_index:
-            return self.algorithmParams.get(name)
-        elif section == joint_index and self.jointParams is not None:
-            if name in self.jointParams:
-                return self.jointParams[name]
-            else:
-                raise ValueError("There is no field " + str(name))
-        else:
-            raise ValueError("Invalid parameter section identifier: " + str(section))
-            
-    def reset(self):
-        self.globalParams.reset()
-        self.applicationParams.reset()
-        self.algorithmParams.reset()
-    
-    def setAttr(self, section: int,name: str, value):
-        if section == globals_index:
-            self.globalParams.setAttr(name,value)
-        elif section == applications_index:
-            self.applicationParams.setAttr(name,value)
-        elif section == algorithms_index:
-            self.algorithmParams.setAttr(name,value)
-        elif section == joint_index:
-            if self.jointParams is None:
-                self.jointParams = dict()
-            self.joinParams[name] = value
-        else:
-            raise ValueError("Invalid parameter section identifier: " + str(section))
-    
-    def getApp(self):
-        return self.applicationParams.getName()
-    
-    def getAlg(self):
-        return self.algorithmParams.getName()
-    
-    def getPath(self, timestamp, randId):
-        return namespace.getFilePath(self, timestamp, randId)
-    
-    def toDict(self):
-        return {
-            "globalParams":self.globalParams.toDict(),
-            "applicationParams":self.applicationParams.toDict(),
-            "algorithmParams":self.algorithmParams.toDict()
-            }
-    
-    def fromDict(data):
-        return ParamSet(BaseParamSet.fromDict(data["globalParams"]), 
-                        BaseParamSet.fromDict(data["applicationParams"]), 
-                        BaseParamSet.fromDict(data["algorithmParams"]))
-    
     
 def firstValidation(data, loadedParams):
     loadedParams["globals"].validateSolo(data["global_vars"])
@@ -398,71 +263,33 @@ def firstValidation(data, loadedParams):
         for dat in data[i]:
             loadedParams[i][dat["name"]].validateSolo(dat)
             
-def fillOut(data,modules, backup):
-    globalValues = None
-    otherValues = {"application":[],"algorithm":[]}
-    indices = dict()
-    
-    if data["unique_globals"]:
-        globalValues = [BaseParamSet("",copy.deepcopy(data["global_vars"])
-                     ,backup["globals"]) for _ in range(data["num_experiments"])]
-        for i in range(data["num_experiments"]):
-            indices[i] = {"globals":i}
-    else:
-        globalValues = [BaseParamSet("",data["global_vars"], backup["globals"])]
-        for i in range(data["num_experiments"]):
-            indices[i] = {"globals":0}
-            
-    for key in otherValues:
-        count = 0
-        for item in data[key + "s"]:
-            first = True
-            currentInstance = None
-            currentPset = None
-            for r in item["ranges"]:
-                for i in range(r[0],r[1]+1):
-                    if item["unique_instance"] or item["unique"] or first:
-                        if item["unique"] or first:
-                            currentPset = BaseParamSet(item["name"]
-                                , copy.deepcopy(item["params"])
-                                ,backup[key+"s"][item["name"]])
-                        if item["unique"] or item["unique_instance"] or first:
-                            count += 1
-                            currentInstance = {"params":currentPset,"instance":modules[key][item["name"]].createInstance(currentPset)}
-                            otherValues[key].append(currentInstance)
-                            first = False
-                    indices[i][key] = count - 1
-                    
-    return [(globalValues[indices[i]["globals"]]
-             ,otherValues["application"][indices[i]["application"]]
-             ,otherValues["algorithm"][indices[i]["algorithm"]])
-            for i in range(data["num_experiments"])]
 
-def createAndValidateParams(data, modules, backup, loadedParams):
-    dat = fillOut(data, modules, backup)
-    ret = []
-    for g, ap, al in dat:
-        p = ParamSet(g, ap["params"], al["params"])
-        
-        if (hasattr(loadedParams["globals"],"doFullCheck") and 
-            (type(loadedParams["globals"].doFullCheck) is bool)
-            and loadedParams["globals"].doFullCheck):
-            loadedParams["globals"].validateFull(p,ap["instance"],al["instance"])
-        
-        if (hasattr(loadedParams["applications"][ap["params"].getName()],"doFullCheck") and 
-            (type(loadedParams["applications"][ap["params"].getName()].doFullCheck) is bool)
-            and loadedParams["applications"][ap["params"].getName()].doFullCheck):
-            loadedParams["applications"][ap["params"].getName()].validateFull(p,ap["instance"],al["instance"])
-            
-        if (hasattr(loadedParams["algorithms"][al["params"].getName()],"doFullCheck") and 
-            (type(loadedParams["algorithms"][al["params"].getName()].doFullCheck) is bool)
-            and loadedParams["algorithms"][al["params"].getName()].doFullCheck):
-            loadedParams["algorithms"][al["params"].getName()].validateFull(p,ap["instance"],al["instance"])
-            
-        p.reset()
-        ret.append((p, ap["instance"], al["instance"]))
-        
-    return ret
+def createAndValidateParams(data,modules, backup, params):
+    _globals = ParamWrapper("", data["unique_globals"], data["global_vars"], backup["globals"])
+    experiments = [ExperimentWrapper(_globals, params["globals"]) for _ in range(data["num_experiments"])]
+    for category in ["applications","algorithms"]:
+        for item in data[category]:
+            _par = ParamWrapper(item["name"], item["unique"], item["params"], 
+                backup[category][item["name"]])
+            instances = InstanceWrapper(item["unique"], item["unique_instance"], _par, 
+                modules[category[:-1]][item["name"]])
+            pmod = params[category][item["name"]]
+            for r in item["ranges"]:
+                for i in range(r[0], r[1]+1):
+                    if category == "applications":
+                        experiments[i].setApp(instances, pmod)
+                    else:
+                        experiments[i].setAlg(instances, pmod)
+                        
+                        
+    gs = _globals.get()
+    for experiment in experiments:
+        experiment.validate()
+    for experiment in experiments:
+        experiment.reset()
+    _globals.reset()
+    return (gs, experiments)
+
         
 
 
@@ -470,13 +297,5 @@ def readInFile(fileName):
     data = getAndValidateInput(fileName)
     loadedParams, modules, backup = loadModules(listModules(data))
     firstValidation(data, loadedParams)
-    ret = None
-    if data["unique_globals"]:
-        ret = BaseParamSet("",copy.deepcopy(data["global_vars"])
-                 ,backup["globals"])
-    else:
-        ret = BaseParamSet("",data["global_vars"], backup["globals"])
-        
-    return (ret, createAndValidateParams(data, modules, backup, 
-             loadedParams))
+    return createAndValidateParams(data, modules, backup, loadedParams)
 
