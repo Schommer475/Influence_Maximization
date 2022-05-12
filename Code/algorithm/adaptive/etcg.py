@@ -6,7 +6,7 @@ Created on Sat Mar 26 18:41:32 2022
 """
 from algorithm.algorithm import Algorithm
 from application.application import Application
-from parameters.parameterization import ParamSet
+from parameters.parameterization_classes import ParamSet
 import math
 import numpy as np
 import pickle
@@ -86,8 +86,8 @@ class Etcg(Algorithm):
             pickle.dump(output, f)
             
         ret = dict()
-        ret["selected_actions"] = selected_action_etcg
-        ret["observed_influences"] = obs_influences_etcg
+        ret["best_seed_sets"] = selected_action_etcg
+        ret["rewards"] = obs_influences_etcg
         return ret
         
 
