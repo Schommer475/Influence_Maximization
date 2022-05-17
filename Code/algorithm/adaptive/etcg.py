@@ -7,6 +7,7 @@ Created on Sat Mar 26 18:41:32 2022
 from algorithm.algorithm import Algorithm
 from application.application import Application
 from parameters.parameterization_classes import ParamSet
+from Utilities.program_vars import joint_index
 import math
 import numpy as np
 import pickle
@@ -35,7 +36,7 @@ class Etcg(Algorithm):
         ...
     
     def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
-        N = app.getOptionCount()
+        N = pset.get(joint_index, "N")
         
         m = self._calcM(N)
         

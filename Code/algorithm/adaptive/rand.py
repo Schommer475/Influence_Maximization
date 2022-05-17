@@ -7,7 +7,7 @@ Created on Thu May 12 11:26:59 2022
 
 from algorithm.algorithm import Algorithm
 from application.application import Application
-from parameterization.parameterization_classes import ParamSet
+from parameters.parameterization_classes import ParamSet
 import random
 
 class Rand(Algorithm):

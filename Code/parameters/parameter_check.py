@@ -2,7 +2,7 @@
 """
 Created on Mon Feb 21 09:45:53 2022
 
-@author: raqua
+@author: Tim Schommer
 """
 from Utilities.program_vars import globals_index, applications_index, algorithms_index
 from importlib import import_module

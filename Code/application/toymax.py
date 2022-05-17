@@ -31,5 +31,5 @@ class ToyMax(Application):
         self.bandits = [random.random() for _ in range(self.params.get("num_choices"))]
         
 
-def getInstance(params):
+def createInstance(params):
     return ToyMax(params)

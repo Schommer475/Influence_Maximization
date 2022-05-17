@@ -214,7 +214,7 @@ class ParamSet:
         elif section == joint_index:
             if self.jointParams is None:
                 self.jointParams = dict()
-            self.joinParams[name] = value
+            self.jointParams[name] = value
         else:
             raise ValueError("Invalid parameter section identifier: " + str(section))
     

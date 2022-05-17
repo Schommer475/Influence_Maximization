@@ -61,6 +61,7 @@ class Propogator:
         influence = 0
                 
         spontaneously_infected = []
+        seeds = list(seeds)
             
         if len(spontaneous_prob) == len(self.DG):
             for m in range(len(self.DG)):
@@ -69,7 +70,8 @@ class Propogator:
                         
         #ImLinUCB used to use all of this information, so it is still supported, 
         #no longer returned here
-        layers, tried, successes = self.basePropogate(list(set(spontaneously_infected + seeds)))  
+        inp = list(set(spontaneously_infected + seeds))
+        layers, tried, successes = self.basePropogate(inp)  
             
         chosen = []
         for k in range(len(layers)):

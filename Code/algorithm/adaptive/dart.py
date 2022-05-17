@@ -7,7 +7,8 @@ Created on Thu May 12 10:14:16 2022
 
 from algorithm.algorithm import Algorithm
 from application.application import Application
-from parameterization.parameterization_classes import ParamSet
+from parameters.parameterization_classes import ParamSet
+from Utilities.program_vars import joint_index
 import numpy as np
 import copy
 
@@ -18,9 +19,8 @@ class DART(Algorithm):
         self.T = params.get("time_horizon")
         
     def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
-        N = app.getOptionCount()
-        error_prob = 1/(N*self.K*self.T)
-        precision = np.sqrt((N*np.log(N*self.T))/(self.T*self.K))
+        N = pset.get(joint_index, "N")
+        precision = pset.get(joint_index, "precision")
         
         t = 0
         A = []
@@ -60,8 +60,6 @@ class DART(Algorithm):
                 
                 
             np.random.shuffle(current_confused_arms)
-#             print(current_confused_arms)
-#             print(mu)
             
             for i in range(int(np.ceil(num_arms/(K-len(A))))):
                 action = []
@@ -75,12 +73,7 @@ class DART(Algorithm):
                 t += 1
                 reward_t = self.__play_action__(action, run_p, t)
                 reward_list.append(reward_t)
-#                 print(t, action, reward_t)
 
-#                 if ((i+1)*(K-len(A)) <= num_arms):
-#                     current_list = action
-#                 else:
-#                     current_list = action[i*(K-len(A)): num_arms]
 
                 num_plays[action] += 1
                 mu[action] = ((num_plays[action]-1)*mu[action]+(reward_t/factor))/num_plays[action]                
@@ -95,8 +88,6 @@ class DART(Algorithm):
                 print(num_arms, K, len(A))
             
             threshold = 2*Delta
-#             threshold = 2*((self.N - self.K)/(self.N-1))*Delta
-#             threshold = 2*Delta
             
             give_space = False
             for i in range(num_arms):
@@ -139,8 +130,6 @@ class DART(Algorithm):
                 break
                         
             if( t > nr*np.ceil(num_arms/(K-len(A))) ):
-#                     print(A)
-#                     print(mu)
 
                 r += 1
                 Delta, nr = self.__update_round_params__(r, N)
@@ -151,7 +140,8 @@ class DART(Algorithm):
                     break
                 
         #select top K arms after exiting
-        action = A + current_confused_arms[np.argsort(-mu[current_confused_arms])[0:K-len(A)]].tolist()
+        action = A + current_confused_arms[np.argsort(-mu[current_confused_arms])\
+                   [0:K-len(A)]].tolist()
         
         while (t < T):
             t+=1
@@ -174,8 +164,8 @@ class DART(Algorithm):
         
         return delta, nr
     
-    def __play_action__(self, action, t = 0):
-        reward = self.environment.reward(action)
+    def __play_action__(self, action, run_p, t = 0):
+        reward = run_p.getReward(action)
         if(t % (self.T/100) == 0):
             print(f"Finished {100*t / (self.T)}% of runs, current run {t}")
         return reward

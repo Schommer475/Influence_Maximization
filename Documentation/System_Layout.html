@@ -1,0 +1,520 @@
+<html>
+    <head>
+        <title>Multi-Armed Bandits System Layout</title>
+        <style>
+            ul {list-style: none;}
+        </style>
+    </head>
+    <body>
+        <h1>Multi-Armed Bandits System Layout</h1>
+        <div id="intro">
+            <p>
+                This file documents the layout of the system for running multi-armed bandits experiments.
+                It provides explanations of what types of files fall under what directories and what some
+                of the existing files do.<br>
+                <b>Note:</b> Everything stated in this documentation is correct with relation to the system 
+                and code at the time the documentation was written. The author makes no guarantee that 
+                future users making updates to the system will update the documentation to correspond with 
+                changes they have made.
+            </p>
+        </div>
+        <div id="table-of-contents">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#Scripts">1 Scripts</a></li>
+                <li><a href="#Files">2 Files</a>
+                    <ul>
+                        <li><a href="#Inputs">2.1 Inputs</a>
+                            <ul>
+                                <li><a href="#common">2.1.1 common</a></li>
+                                <li><a href="#temp">2.1.2 temp</a></li>
+                                <li><a href="#generation">2.1.3 generation</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#Namespace">2.2 Namespaces</a>
+                            <ul>
+                                <li><a href="#global_name_vars">2.2.1 global_name_vars.json</a></li>
+                                <li><a href="#registered_items">2.2.2 registered_items.json</a></li>
+                                <li><a href="#ApplicationNames">2.2.3 ApplicationNames</a></li>
+                                <li><a href="#AlgorithmNames">2.2.4 Files</a></li>
+                                <li><a href="#JointNames">2.2.5 JointNames</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#Outputs">2.3 Outputs</a></li>
+                        <li><a href="#Resources">2.4 Resources</a></li>
+                        <li><a href="#Temporary">2.5 Temporary</a>
+                            <ul>
+                                <li><a href="#Created">2.5.1 Created</a></li>
+                                <li><a href="#Logs">2.5.2 Logs</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="#Code">3 Code</a>
+                    <ul>
+                        <li><a href="#alter_namespace">3.1 alter_namespace.py</a></li>
+                        <li><a href="#run_experiment">3.2 run_experiment.py</a></li>
+                        <li><a href="#generate_input">3.3 generate_input.py</a></li>
+                        <li><a href="#algorithm">3.4 algorithm</a>
+                            <ul>
+                                <li><a href="#algorithm_file">3.4.1 algorithm.py</a></li>
+                                <li><a href="#algorithm_implementations">3.4.2 Implementations</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#application">3.5 application</a>
+                            <ul>
+                                <li><a href="#application_file">3.5.1 application.py</a></li>
+                                <li><a href="#application_implementations">3.5.2 Implementations</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#namespace">3.6 namespace</a>
+                            <ul>
+                                <li><a href="#namespace_file">3.6.1 namespace.py</a></li>
+                                <li><a href="#namespace_manipulation">3.6.2 namespace_manipulation.py</a></li>
+                                <li><a href="#namespace_external">3.6.3 namespace_external.py</a></li>
+                                <li><a href="#namespace_internal">3.6.4 namespace_internal.py</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#parameters">3.7 parameters</a>
+                            <ul>
+                                <li><a href="#global_parameters">3.7.1 global_parameters.py</a></li>
+                                <li><a href="#param_check">3.7.2 param_check.py</a></li>
+                                <li><a href="#parameterization">3.7.3 parameterization.py</a></li>
+                                <li><a href="#parameterization_classes">3.7.4 parameterization_classes.py</a></li>
+                                <li><a href="#algorithm_params">3.7.5 algorithm_params</a></li>
+                                <li><a href="#application_params">3.7.6 application_params</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#Utilities">3.8 Utilities</a>
+                            <ul>
+                                <li><a href="#global_names">3.8.1 global_names.py</a></li>
+                                <li><a href="#program_vars">3.8.2 program_vars.py</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#compilation">3.9 compilation</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div id="contents">
+            <ul>
+                <li>
+                    <h2 id="Scripts">1 Scripts</h2>
+                    <p>This directory is provided to users as an (initially empty) directory tracked by GitHub.
+                        The purpose of this directory is to be a place for users to place their command-line scripts and 
+                        SLURM Job scripts that will be tracked by Git. This enables them to have their scripts available when working
+                        on a remote machine. 
+                    </p>
+                </li>
+                <li>
+                    <h2 id="Files">2 Files</h2>
+                    <p>This is the top level folder containing all of the non-code files (other than the scripts) for the system.
+                        This includes input files, files for deciding the paths of output files, resource files, and generated temporary
+                        files.
+                    </p>
+                    <ul>
+                        <li>
+                            <h3 id="Inputs">2.1 Inputs</h3>
+                            <p>This directory is home to all of the input files used by the system. Both those used for running experiments
+                                and those used for automatically generating experiment input files are found here.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="common">2.1.1 common</h4>
+                                    <p>This directory is to contain all of the commonly used input files for running experiments.
+                                        Its contents are tracked by Git in order to make them readily available on other machines.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="temp">2.1.2 temp</h4>
+                                    <p>This directory is to contain all of the input files for running experiments that are not commonly used,
+                                        such as those that are quickly thrown together in order to test a new application or algorithm. Its 
+                                        contents are not tracked by Git.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="generation">2.1.3 generation</h4>
+                                    <p>This directory is to contain all of the files used to automatically generate input files for experiments.
+                                        Its contents are not tracked by Git.
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="Namespace">2.2 Namespaces</h3>
+                            <p>This directory houses all of the files used by the namespace sub-system.
+                                The namespace sub-system is the system that handles the file paths of the temporary result
+                                files generated by running experiments. It handles both determining what the file path should
+                                be for new files and changing the paths of existing files when a path format is changed.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="global_name_vars">2.2.1 global_name_vars.json</h4>
+                                    <p>
+                                        If this file exists, it specifies the global variables used for the namespace system.
+                                        At the time of writing, that consits only of a variable indicating whether it is application
+                                        or algorithm information that should appear first in file paths. If this file does not exist
+                                        the default is that application values appear first. This file is automatically created if needed.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="registered_items">2.2.2 registered_items.json</h4>
+                                    <p>This file, if it exists, is used to hold a list of all registered 
+                                        applications and algorithms. The one and only purpose this serves is 
+                                        to allow the user interface that manipulates path configurations to use
+                                        'all' commands. The lists are used as the list of all applications and algorithms 
+                                        in those cases.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="ApplicationNames">2.2.3 ApplicationNames</h4>
+                                    <p>
+                                        This folder, if it exists, contains files indicating path structures for the applications
+                                        used in the system. This folder can be created manually or automatically generated if the properties of an application are changed.
+                                        <br>The files within it should follow the naming convention '&ltapplication name&rt.json'.
+                                        For instance:<br>
+                                        im.json
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="AlgorithmNames">2.2.4 AlgorithmNames</h4>
+                                    <p>
+                                        This folder, if it exists, contains files indicating path structures for the algorithms
+                                        used in the system. This folder can be created manually or automatically generated if the properties of an algorithm are changed.
+                                        <br>The files within it should follow the naming convention '&ltalgorithm name&rt.json'.
+                                        For instance:<br>
+                                        etcg.json
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="JointNames">2.2.5 JointNames</h4>
+                                    <p>
+                                        This folder, if it exists, contains files indicating path structures differentiating individual
+                                        experiments. The files are described per application-algorithm pair for the applications and 
+                                        algorithms used in the system. This folder can be created manually or automatically generated 
+                                        if the properties of an application-algorithm pair are changed.
+                                        <br>The files within it should follow the naming convention '&ltapplication name&rt_&ltalgorithm name&gt.json'.
+                                        For instance:<br>
+                                        im_etcg.json
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="Outputs">2.3 Outputs</h3>
+                            <p>
+                                This (initially empty) directory is the designated location for users to place final generated output files, such 
+                                as graphs and plots. Its contents are not tracked by Git, since generated files should not be committed to version control.
+                            </p>
+                        </li>
+                        <li>
+                            <h3 id="Resources">2.4 Resources</h3>
+                            <p>
+                                This directory is the designated location for placing files used as resources by the code. For instance, (at the time of writing)
+                                the Influence Maximization (im) application often uses a file called 'facebook_network.txt' and an acompanying file 'communities.pkl'.
+                                These files are located in the Resources folder. Additionally, when the algorithm IMLinUCB was being used, it required a file 'node2vec.exe'.
+                                This file would also be stored in the Resources folder. The contents of this folder are tracked by Git.
+                            </p>
+                        </li>
+                        <li>
+                            <h3 id="Temporary">2.5 Temporary</h3>
+                            <p>
+                                This directory is home to temporary files created in the process of running experiments. These include the results of individual experiments
+                                (as opposed to results that have been processed to create plots) and log files used for resuming interrupted sets of experiments. It could also
+                                include other files such as sets of experiment data after it has been processed but before it has been turned into plots, but the current setup
+                                does not touch on that. None of the files that fall under this directory are tracked by Git.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="Created">2.5.1 Created</h4>
+                                    <p>
+                                        This directory contains the intermediate output files generated by running experiments and is created when needed if it does not already
+                                        exist. When using the namespace system to determine a file
+                                        path, the paths identified are relative to this directory. The contents of this directory are not tracked by Git.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="Logs">2.5.2 Logs</h4>
+                                    <p>
+                                        This directory contains the log files that are generated by system to enable interrupted sets of experiments to be resumed and is created 
+                                        when needed if it does not already exist. Its contents are not tracked by Git.
+                                        <br>
+                                        <b>IMPORTANT NOTE:</b> These files should be deleted every so often. They are only used for resuming runs, they take up space,
+                                        and the more of them that accumulate, the greater the chance of encountering a set of experiments whose id number matches with
+                                        the number on an existing log file.
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h2 id="Code">3 Code</h2>
+                    <p>This directory houses all of the code written for the project. It also acts as the working 
+                        directory for all code within the project: all code files should write their import statements
+                        relative to this directory and all program main entry points should be called
+                        directly from this directory, not from any directory above or below it.
+                        That is what allows the project to use a package structure: in Python, import statements are
+                        assumed to be relative to your working directory. All files anywhere under this directory are
+                        tracked by Git.
+                        <br>
+                        At the time of writing, this directory also contains all of the files in the system with main 
+                        entry points, with the exception of the code for compiling experimental results and producing
+                        plots, which is code from the old system that is still in use, located in compilation folder.
+                    </p>
+                    <ul>
+                        <li>
+                            <h3 id="alter_namespace">3.1 alter_namespace.py</h3>
+                            <p>
+                                This file serves as the main entry point for a user to change the current path configuration of 
+                                applications, algorithms, and application-algorithm pairs in the namespace system.
+                                It also calls functions enabling the user to retrieve information on current configurations
+                                within the namespace system.
+                            </p>
+                        </li>
+                        <li>
+                            <h3 id="run_experiment">3.2 run_experiment.py</h3>
+                            <p>
+                                This file serves as the main entry point for a user to run sets of experiments in the 
+                                multi-armed bandit problem domain.
+                            </p>
+                        </li>
+                        <li>
+                            <h3 id="generate_input">3.3 generate_input.py</h3>
+                            <p>
+                                This file is a main entry point and performs the function of creating input files
+                                for <a href="#run_experiment">run_experiment.py</a> by taking a simpler type of input file
+                                specifying different possible values for application and algorithm parameters and exhaustively
+                                combining them to create a set of experiments.
+                            </p>
+                        </li>
+                        <li>
+                            <h3 id="algorithm">3.4 algorithm</h3>
+                            <p>
+                                This directory houses the file defining the abstract class for Algorithms and all files
+                                implementing the Algorithm abstract base class. It also houses any additional code files 
+                                those Algorithm implementations may need to define in order to work properly.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="algorithm_file">3.4.1 algorithm.py</h4>
+                                    <p>This file defines the abstract base class that algorithms are supposed to extend
+                                        and implement.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="algorithm_implementations">3.4.2 Implementations</h4>
+                                    <p>
+                                        <b>Note:</b> 'Implementations' is not the actual name of a folder or file. Rather
+                                        it is the section header and refers to a group of files and/or folders that fall into 
+                                        the 'algorithm' directory.
+                                        <br>
+                                        These are the files that extend and implement the Algorithm abstract base class, as well 
+                                        as any other code files necessary to complete that implementation. These files can be located
+                                        either directly under the algorithm directory or within a directory structure
+                                        underneath the algorithm directory.
+                                        <br>
+                                        The files containing the definition of the class that extends Algorithm should 
+                                        follow the naming convention of '&ltalgorithm name&gt.py'. For instance:
+                                        <br>
+                                        etcg.py
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="application">3.5 application</h3>
+                            <p>
+                                This directory houses the file defining the abstract class for Applications and all files
+                                implementing the Application abstract base class. It also houses any additional code files 
+                                those Application implementations may need to define in order to work properly.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="application_file">3.5.1 application.py</h4>
+                                    <p>This file defines the abstract base class that applications are supposed to extend
+                                        and implement.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="application_implementations">3.5.2 Implementations</h4>
+                                    <p>
+                                        <b>Note:</b> 'Implementations' is not the actual name of a folder or file. Rather
+                                        it is the section header and refers to a group of files and/or folders that fall into 
+                                        the 'application' directory.
+                                        <br>
+                                        These are the files that extend and implement the Algorithm abstract base class, as well 
+                                        as any other code files necessary to complete that implementation. These files can be located
+                                        either directly under the application directory (such as with toylin, at the time of writing)
+                                         or within a directory structure underneath the application directory
+                                         (such as with im, at the time of writing).
+                                        <br>
+                                        The files containing the definition of the class that extends Application should 
+                                        follow the naming convention of '&ltapplication name&gt.py'. For instance:
+                                        <br>
+                                        im.py
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="namespace">3.6 namespace</h3>
+                            <p>
+                                This directory houses all of the code (except the main entry point) for the namespace
+                                sub-system. The namespace sub-system is the system that handles the file paths of the temporary result
+                                files generated by running experiments. It handles both determining what the file path should
+                                be for new files and changing the paths of existing files when a path format is changed.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="namespace_file">3.6.1 namespace.py</h4>
+                                    <p>
+                                        This file contains the code for retrieving the file path that should be 
+                                        assigned to the results of an experiment, given the experiment parameters
+                                        and a timestamp and random id to use. It also contains some functions and 
+                                        variables used by both itself and some of the other namespace code files.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="namespace_manipulation">3.6.2 namespace_manipulation.py</h4>
+                                    <p>
+                                        This file contains functions enabling a user to change the current path configuration of 
+                                        applications, algorithms, and application-algorithm pairs in the namespace system. These 
+                                        functions perform some pre-processing and then call functions in the namespace_external.py 
+                                        and namespace_internal.py files.<br>
+                                        This file also contains functions enabling the user to retrieve information on current configurations
+                                        within the namespace system.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="namespace_external">3.6.3 namespace_external.py</h4>
+                                    <p>
+                                        This file contains functions that change the layout of the filesystem when some current path 
+                                        configuration is being changed.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="namespace_internal">3.6.4 namespace_internal.py</h4>
+                                    <p>
+                                        This file contains functions that change the contents of the configuration 
+                                        files under Files/Namespaces when some current path configuration is being changed.
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="parameters">3.7 parameters</h3>
+                            <p>
+                                This directory houses code files specifying how to read in experiment input files, check for the 
+                                existence of parameters, and look up values of parameters. As well as the parameter files for the system
+                                and each of the applications and algorithms.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="global_parameters">3.7.1 global_parameters.py</h4>
+                                    <p>
+                                        This file is the parameter file containing the global parameters for running experiments and their
+                                        default values. 
+                                        Since this file is a parameter file, it also contains a method called 'validateSolo' to validate a 
+                                        dictionary of parameters given in an input file.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="param_check">3.7.2 param_check.py</h4>
+                                    <p>
+                                        This file is used by the namespace sub-system when a user is adding a parameter 
+                                        to a path configuration. It is used to check that the parameter being added is a parameter 
+                                        within the parameter file for the specified application or algorithm.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="parameterization">3.7.3 parameterization.py</h4>
+                                    <p>
+                                        This file performs the process of reading in an input file, validating its 
+                                        contents, and creating a set of Applications, Algorithms, and ParamSets (used
+                                        to look up parameter values), and matching them into a list of experiments
+                                        to run. Individual experiments are validated if necessary and then the list 
+                                        of experiments is returned along with a BaseParamSet of global variables 
+                                        in order to be run.
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="parameterization_classes">3.7.4 parameterization_classes.py</h4>
+                                    <p>
+                                        This file contains the definitions for the classes used by parameterization.py. It also 
+                                        contains the classes (BaseParamSet and ParamSet) used to look up parameters for experiments
+                                        and retrieve either the value specified in the input file (if a value was specified) or the 
+                                        default value (if no value was specified). 
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="algorithm_params">3.7.5 algorithm_params</h4>
+                                    <p>
+                                        This directory is to contain the parameter files for the algorithms used in the 
+                                        experiments. The parameter files should follow the naming convention 
+                                        '&ltalgorithm name&gt_params.py'. For instance:<br>
+                                        etcg_params.py
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="application_params">3.7.6 application_params</h4>
+                                    <p>
+                                        This directory is to contain the parameter files for the applications used in the 
+                                        experiments. The parameter files should follow the naming convention 
+                                        '&ltapplication name&gt_params.py'. For instance:<br>
+                                        im_params.py
+                                    </p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="Utilities">3.8 Utilities</h3>
+                            <p>
+                                This directory is to house the code that is shared by many parts of the system or by
+                                many applications and/or algorithms. It also houses files containing global variables
+                                that are not parameters for running experiments.
+                            </p>
+                            <ul>
+                                <li>
+                                    <h4 id="global_names">3.8.1 global_names.py</h4>
+                                    <py>
+                                        This file specifies the file paths used for accessing various parts of the 
+                                        system, such as the Resources directory. It also contains the file names for 
+                                        the most commonly used resource files.
+                                    </py>
+                                </li>
+                                <li>
+                                    <h4 id="program_vars">3.8.2 program_vars.py</h4>
+                                    <py>
+                                        This file specifies the values of global variables used by the system 
+                                        that are not run parameters. Such as the numerical indices that should be 
+                                        associated with globals, applications, algorithms, or the joint between 
+                                        applications and algorithms. (Used by many files to specify which grouping
+                                        is being worked with.) Another example is the string that should be used 
+                                        to separate parameter values in file paths when they are not being separated
+                                        by a file break.
+                                    </py>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3 id="compilation">3.9 compilation</h3>
+                            <p>
+                                This directory is to contain code pertaining to compiling experiment results and 
+                                producing graphs. 
+                                <br>
+                                <b>Note:</b> At the time of writing, since this part of the process did not 
+                                end up being part of the final system design, this folder contains code from 
+                                the old system that has only been partially adapted. (It has had its imports and 
+                                file paths adapted to a form used at an intermediate stage in the system design.)
+                                These files will need to be changed further in order to be compatible with 
+                                the current setup. Thus, this note may quickly be out of date for at least some
+                                of the files in this directory.
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

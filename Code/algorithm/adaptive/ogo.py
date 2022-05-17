@@ -7,7 +7,8 @@ Created on Thu May 12 10:47:31 2022
 
 from algorithm.algorithm import Algorithm
 from application.application import Application
-from parameterization.parameterization_classes import ParamSet
+from parameters.parameterization_classes import ParamSet
+from Utilities.program_vars import joint_index
 import numpy as np
 import math
 import random
@@ -19,28 +20,21 @@ class OGO(Algorithm):
         self.T = params.get("time_horizon")
         
     def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
-        N = app.getOptionCount()
+        N = pset.get(joint_index, "N")
         K = self.K
         T = self.T
         options = app.listOptions()
         
-        gamma = N**(1/3)*K*(math.log(N)/T)**(1/3)
-        
-        if gamma >= 0.5:
-            gamma = 0.5
+        gamma = pset.get(joint_index, "gamma")
             
         #learning rate for WMR algorithm
-        epsilon = math.sqrt(math.log(N)/(T*gamma/K))
-        #epsilon = 0.2
+        epsilon = pset.get(joint_index, "epsilon")
         
         selected_action_ogo = []
         obs_influences_ogo = []
         weights = np.array([[1 for i in range(N)] for j in range(K)], dtype='float')
         
         for i in range(T):
-            #epsilon = math.sqrt(math.log(N)/(i+1))
-            #row_sums = weights.sum(axis=1)
-            #weights = weights / row_sums[:, np.newaxis]
             #Explore with probability gamma
             if random.random() <= gamma:
                 selected_action = []
@@ -71,13 +65,11 @@ class OGO(Algorithm):
                         else:
                             loss[p][q] = explore_reward
                         weights[p][q] *= math.exp(-epsilon*loss[p][q])
-                        #weights[p][q] *= (1-0.2*loss[p][q]) 
                 
                 obs_influences_ogo.append(explore_reward)
                 
             else:
                 selected_action = []
-                #loss = [[0 for i in range(N)] for j in range(K)]
                 for j in range(K):
                     prob = [number/sum(weights[j]) for number in weights[j]]
                     while True:
@@ -89,7 +81,6 @@ class OGO(Algorithm):
                 selected_action_ogo.append(selected_action)
                 obs_influences_ogo.append(app.getReward(selected_action))
             
-            #gamma = gamma - decay
             
         return {"best_seed_sets":selected_action_ogo, "rewards":obs_influences_ogo}
         

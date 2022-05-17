@@ -1,0 +1,4 @@
+{
+"applications":["im","toylin","toymax"],
+"algorithms":["cmab","csar","dart","etcg","ogo","rand","ucbgr"]
+}

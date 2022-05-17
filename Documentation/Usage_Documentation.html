@@ -1,0 +1,414 @@
+<html>
+    <head>
+        <title>Multi-Armed Bandits System Usage</title>
+        <style>
+            ul {list-style: none;}
+        </style>
+    </head>
+    <body>
+        <h1>Multi-Armed Bandits System Usage</h1>
+        <div id="intro">
+            <p>
+                This file documents how to use the system for running multi-armed bandits experiments.<br>
+                <b>Note:</b> Everything stated in this documentation is correct with relation to the system 
+                and code at the time the documentation was written. The author makes no guarantee that 
+                future users making updates to the system will update the documentation to correspond with 
+                changes they have made.
+            </p>
+        </div>
+        <div id="table-of-contents">
+            <h2>Table of Contents</h2>
+            <ul>
+
+            </ul>
+        </div>
+        <div id="contents">
+            <div id="quick_guides">
+                <h2>Getting Started</h2>
+                <p>
+
+                </p>
+                <div id="experimenting">
+                    <h3>Running Experiments</h3>
+                    <p>
+
+                    </p>
+                    <ol>
+                        <li>Create an input file</li>
+                        <li>Run the experiments</li>
+                        <li>Compile and plot results</li>
+                    </ol>
+                </div>
+                <div id="adding_application">
+                    <h3>Adding a New Application</h3>
+                    <p>
+
+                    </p>
+                    <ol>
+                        <li>Create a parameter file.</li>
+                        <li>Create an implementation.</li>
+                        <li>Configure the path setup.</li>
+                        <li>(Optional, but recommended) Register the application in the namespace sub-system.</li>
+                    </ol>
+                </div>
+                <div id="adding_algorithm">
+                    <h3>Adding a New Algorithm</h3>
+                    <p>
+
+                    </p>
+                    <ol>
+                        <li>Create a parameter file.</li>
+                        <li>Create an implementation.</li>
+                        <li>Configure the path setup.</li>
+                        <li>(Optional, but recommended) Register the algorithm in the namespace sub-system.</li>
+                    </ol>
+                </div>
+            </div>
+            <div id="editing_code">
+                <h2>Creating and Editing Code</h2>
+                <p>
+
+                </p>
+                <div id="editing_existing_code">
+                    <h3>Editing Existing Code</h3>
+                    <p>
+
+                    </p>
+                </div>
+                <div id="using_paramset">
+                    <h3>Working With ParamSet</h3>
+                    <p>
+
+                    </p>
+                </div>
+                <div id="parameter_files">
+                    <h3>Writing a Parameter File</h3>
+                    <p>
+
+                    </p>
+                </div>
+                <div id="implementing_applications">
+                    <h3>Implementing an Application</h3>
+                    <p>
+
+                    </p>
+                </div>
+                <div id="implementing_algorithms">
+                    <h3>Implementing an Algorithm</h3>
+                    <p>
+                        
+                    </p>
+                </div>
+                <div id="experiment_results">
+                    <h3>Retrieving Experiment Results</h3>
+                    <p>
+                        
+                    </p>
+                </div>
+            </div>
+            <div id="paths">
+                <h2>Configuring and Changing Experiment Result File Paths</h2>
+                <p>
+
+                </p>
+                <div id="path_design">
+                    <h3>Experiment Result File Path Structure</h3>
+                    <p>
+
+                    </p>
+                    <div id="path_components">
+                        <h4>Components of Experiment Result File Paths</h4>
+                        <p>
+
+                        </p>
+                    </div>
+                    <div id="connecting_components">
+                        <h4>A Complete File Path</h4>
+                        <p>
+
+                        </p>
+                    </div>
+                    <div id="namespace_files">
+                        <h4>Path Configuration Files</h4>
+                        <p>
+
+                        </p>
+                        <div id="app_alg_namespace">
+                            <h5>Application and Algorithm Configuration Files</h5>
+                            <p>
+
+                            </p>
+                        </div>
+                        <div id="joint_namespace">
+                            <h5>Experiment Identifier (Joint) Configuration Files</h5>
+                            <p>
+
+                            </p>
+                        </div>
+                        <div id="ordering">
+                            <h5>Application-Algorithm Path Parameter Order</h5>
+                            <p>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="config_information">
+                    <h3>Current Path Configuration Information</h3>
+                    <p>
+
+                    </p>
+                </div>
+                <div id="altering_namespace">
+                    <h3>Changing Path Configurations</h3>
+                    <p>
+                        
+                    </p>
+                </div>
+            </div>
+            <div id="run_experiments">
+                <h2>Details on Running Experiments</h2>
+                <p>
+
+                </p>
+                <div id="input_files">
+                    <h3>Creating Input Files</h3>
+                    <div id="handcrafted_input">
+                        <h4>Manually Creating Input Files</h4>
+                        <p>
+
+                        </p>
+                    </div>
+                    <div id="generating_input">
+                        <h4>Generating Input Files</h4>
+                        <div id="generation_file">
+                            <h5>Generation Files</h5>
+                            <p>
+
+                            </p>
+                        </div>
+                        <div id="generating">
+                            <h5>UI to Generate Input Files</h5>
+                            <p>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div id="running">
+                    <h3>UI to Run and Resume Experiments</h3>
+                    <p>
+
+                    </p>
+                </div>
+            </div>
+            <div id="misc">
+                <h2>Miscellaneous</h2>
+                <div id="terminology">
+                    <h3>Terminology</h3>
+                    <p>
+                        In the process of creating the multi-armed bandits experiment system, there was some internal terminology
+                        developed and used. Where possible, this documentation will strive to either use clearer terminology and/or 
+                        to define these terms in the places they are used. However, in case some instances are missed, the terminology
+                        definitions are collected here.
+                    </p>
+                    <ul style="list-style: circle;">
+                        <li>
+                            <b>joint</b>:
+                            The term 'joint' refers to information, files, etc, that are, in some way, tied to both applications and 
+                            algorithms.<br> 
+                            In the namespace system, the information chosen to identify an individual run (timestamp, random id) is 
+                            configurable on the level of which application is paired with which algorithm. Since it pertains to both, 
+                            the configuration information is known as joint information or the joint configuration and files and folder 
+                            used to hold this information are also referred to as joint.<br>
+                            In the system for looking up parameters, any static values that calculated using information from both the 
+                            application and the algorithm are known as joint parameters and are stored and accessed using the global 
+                            variable joint_index.
+                        </li>
+                        <li>
+                            <b>namespace</b>: 
+                            The term 'namespace' refers to how the file paths of experiment result files are configured. Similarly, 
+                            'namespace system' refers to the sub-system that calculates these paths and changes the paths and configurations 
+                            for existing and current files, and 'namespace files' refers to files specifying the configurations for different
+                            applications, algorithms, and application-algorithm pairs.
+                        </li>
+                    </ul>
+                </div>
+                <div id="json_primer">
+                    <h3>Primer on JSON Files</h3>
+                    <p>
+                        JavaScript Object Notation (JSON) is a format for serializing object data (no functions) as text.
+                        All system, logging, and input files used by the system use JSON format, so an overview is provided here.
+                    </p>
+                    <div>
+                        <p>Values in JSON are all one of the following datatypes:</p>
+                        <ol>
+                            <li>
+                                <p>
+                                    <b>String</b>:
+                                    A JSON String functions like a String in most programming languages (sequence of characters surrounded by quotation marks) with one notable rule:
+                                    The quotation marks surrounding the sequence of characters MUST be double quotes. So "hello" is a valid JSON String and 'hello' is not.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>number</b>:
+                                    Numbers are represented in JSON the same way they are represented in most programming languages. Numbers can be in integer or floating point format,
+                                    hexadecimal and other formats are not supported.
+                                    <br>
+                                    <b>Some examples:</b>
+                                    <br>
+                                    42
+                                    <br>
+                                    37.0485
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>boolean</b>:
+                                    Boolean values in JSON are represented by the lower-case literals:<br>
+                                    true<br>
+                                    false<br>
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>null</b>: 
+                                    Null values are represented with the literal 'null'<br>
+                                    <b>For instance:</b><br>
+                                    "value":null
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>List</b>:
+                                    Lists in JSON are similar to Lists in Python: they consist of a left bracket ([), a right bracket (]), and zero or more comma-separated JSON values
+                                    between them.<br>
+                                    <b>Example 1:</b><br>
+                                    []<br>
+                                    <b>Example 2:</b><br>
+                                    [true]<br>
+                                    <b>Example 3:</b><br>
+                                    [false, "hello", null, 42.2, {"greeting":"hola", "age":32}, [45, 38]]
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Object</b>:
+                                    Objects in JSON are containers for variables, similar to Python dictionaries. They consist of a right curly brace ({), a left curly brace (}),
+                                    and zero or more comma-separated JSON variables between them.<br>
+                                    <b>Example 1:</b><br>
+                                    {}<br>
+                                    <b>Example 2:</b><br>
+                                    {"alive":true}<br>
+                                    <b>Example 3:</b><br>
+                                    {"dead":false, "greeting":"hello", "fastest_runner":null, "best_time":42.2, "other":{"greeting":"hola", "age":32}, "friends":["frank", "joe"]}
+                                </p>
+                            </li>
+                        </ol>
+                    </div>
+                    <p>
+                        JSON variables are defined using a JSON String for the variable name, followed by a colon (:) as the assignment operator, and then finally a value that is one
+                        of the JSON data types. This is similar to how dictionary items are defined in Python when using an initializer string.
+                        <br>
+                        <b>For instance:</b> "greetings":["hello","hola","aloha"]
+                    </p>
+                    <p>
+                        JSON files are simple text files (.txt) with the extension changed to '.json'. The content of a JSON file
+                        is a JSON object that is not assigned to anything.
+                        <br>
+                        <b>For instance:</b>
+                        <br>
+                        <pre>{
+    "greeting":"hello"
+}
+                        </pre>
+                        Could be the entire content of a JSON file.
+                    </p>
+                    <p>
+
+                    </p>
+                </div>
+                <div id="names">
+                    <h3>Application and Algorithm Names</h3>
+                    <p>
+                        Parts of the documentation mention the use of an 'application name' or an 'algorithm name'.
+                        This name should be a string with specific spelling and capitalization used to refer to the application or 
+                        algorithm. For example, the influence maximization application has the application name im.<br>
+                        This name wil be used within file names and file paths, so it should not contain the basic separator string or 
+                        file path break characters and should only contain characters that are valid to use in file paths.
+                    </p>
+                </div>
+                <div id="basic_separator">
+                    <h3>Basic Separator</h3>
+                    <p>
+                        The term 'basic separator' or 'basic_separator' refers to a global String variable 'basic_separator' located in 'Code/Utilities/program_vars.py'.
+                        When constructing the file paths for experimental result files, parameters that are not separated by path breaks (making folders) are separated by this 
+                        String.<br>
+                        At the time of writing, the value of this String is '_' (The underscore character).<br>
+                        While it is theoretically possible to change the value of  the basic separator, no systems are currently in place to enact this change automatically.
+                        If you wish to change this value, you need to perform the following steps:
+                        <ol>
+                            <li>Change the value of basic_separator to the new value.</li>
+                            <li>Manually replace the previous value with the new one in all locations of all paths for all existing 
+                                generated experiment result files.
+                            </li>
+                            <li>Ensure that no application or algorithm names contain the new basic_separator value. If they do you will need to change the 
+                                conflicting names and replace the old names in all relevant locations. Including:
+                                <ol>
+                                    <li>Application or Algorithm implementation file names.</li>
+                                    <li>Parameter file names.</li>
+                                    <li>Namespace file names, if a namespace file exists for the application or algorithm in question.</li>
+                                    <li>The first item in the "headers" list within the namespace file, if such a file exists.</li>
+                                </ol>
+                            </li>
+                            <li>
+                                Ensure that no parameter value used in a path uses the new basic separator value in its string representation.
+                                For any that do, you will need to change how the string representation is crafted and change the file path 
+                                value of any existing files to match the new representation.
+                            </li>
+                        </ol>
+                    </p>
+                </div>
+                <div id="unique_params">
+                    <h3>Unique Parameters</h3>
+                    <p>
+                        Input files specifying applications or algorithms have the option to specify a boolean variable 'unique' for every application and algorithm.
+                        What that variable does, if set to true, is to specify that every experiment in which the listed application/algorithm configuration 
+                        participates should receive a new, deep copy of the parameter dictionary for the configuration. If false, it will save memory by using the same parameter
+                        dictionary instance for all experiments in which the application/algorithm participates. This option is available to help avoid side effects if 
+                        using the same dictionary instance could cause problems.<br>
+                        In cases where this variable does not appear, a default value is used. The default value is defined by the boolean variable 'default_unique_params' 
+                        located in 'Code/Utilities/program_vars.py'. At the time of writing, the default value is false.
+                        <b>IMPORTANT NOTE:</b> This variable does <b>NOT</b> affect cases where multiple runs are desirable for each instance of the experiment. 
+                        Future work on the system may wish to address this shortcoming, but, as a current workaround, designing Applications and Algorithms to 
+                        store some initial state for the parameters that is restored when the 'refresh' function is called should work so long as the global variable 
+                        'reset' is always set to true in input files.
+                    </p>
+                </div>
+                <div id="unique_instance">
+                    <h3>Unique Instance</h3>
+                    <p>
+                        Input files specifying applications or algorithms have the option to specify a boolean variable 'unique_instance' for every application and algorithm.
+                        What that variable does, if set to true, is to specify that every experiment in which the listed application/algorithm configuration 
+                        participates should recieve a new Application/Algorithm instance to work with. If false, it will save memory by using the same Application/Algorithm instance 
+                        for all experiments in which the application/algorithm participates. This option is available to help avoid side effects if 
+                        using the same Application/Algorithm instance could cause problems.<br>
+                        In cases where this variable does not appear, a default value is used. The default value is defined by the boolean variable 'default_unique_instance' 
+                        located in 'Code/Utilities/program_vars.py'. At the time of writing, the default value is false.
+                        <b>IMPORTANT NOTE:</b> This variable does <b>NOT</b> affect cases where multiple runs are desirable for each instance of the experiment. 
+                        Future work on the system may wish to address this shortcoming, but, as a current workaround, designing Applications and Algorithms to 
+                        store some initial state for the parameters that is restored when the 'refresh' function is called should work so long as the global variable 
+                        'reset' is always set to true in input files.
+                    </p>
+                </div>
+                <div>
+                    global params
+                </div>
+                <div>
+                    program indices
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

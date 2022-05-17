@@ -7,7 +7,8 @@ Created on Wed May 11 20:57:36 2022
 
 from algorithm.algorithm import Algorithm
 from application.application import Application
-from parameterization.parameterization_classes import ParamSet
+from parameters.parameterization_classes import ParamSet
+from Utilities.program_vars import joint_index
 import numpy as np
 from scipy.linalg import hadamard
 
@@ -21,13 +22,14 @@ class CSAR(Algorithm):
         self.error_prob = 1/self.T
         
     def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
-        N = app.getOptionCount()
+        N = pset.get(joint_index, "N")
         K = self.K
         T = self.T
 
         rewards = np.zeros(T)
 
-        active_set = np.array(app.listOptions())
+        arm_indices = {item:index for index, item in enumerate(app.listOptions())}
+        active_set = np.array(list(arm_indices.keys()))
         
         run_p = RunParams(rewards, active_set, app)
 
@@ -52,13 +54,13 @@ class CSAR(Algorithm):
                 keep_mask = np.ones(len(run_p.active_set), dtype=bool)
 
                 for arm_id, arm in enumerate(run_p.active_set):
-                    if (mu_hat[arm] > (mu_hat[sorting[K]] + 2*Delta)):
+                    if (mu_hat[arm_indices[arm]] > (mu_hat[sorting[K]] + 2*Delta)):
                         keep_mask[arm_id] = 0
                         run_p.accept_set += [arm]
 
                     if (mu_hat[arm] < (mu_hat[sorting[K-1]] - 2*Delta)):
                         keep_mask[arm_id] = 0
-                        run_p.reject_set += [arm]
+                        run_p.reject_set += [arm_indices[arm]]
 
                 run_p.active_set = run_p.active_set[keep_mask]
 
@@ -85,7 +87,6 @@ class CSAR(Algorithm):
     
     def create_arm_partition(self, run_p):
         K = self.K
-    #         K = 2*int(np.ceil(np.log(K)/np.log(2)))
     
         num_partitions = np.ceil(len(run_p.active_set.tolist())/(2*K))
     
@@ -148,7 +149,7 @@ class CSAR(Algorithm):
                 run_p.t += 1
                 count += 1
     
-                if (run_p.t >= run_p.T):
+                if (run_p.t >= self.T):
                     return self.calc_reward_estimates(sample_mean, H)
     
             row = 1

@@ -1,0 +1,4 @@
+{
+"headers":["app-im","network_id","weighting_method","propTypeId"],
+"separators":[false,false,false,false]
+}

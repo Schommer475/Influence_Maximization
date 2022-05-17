@@ -6,7 +6,8 @@ Created on Fri Apr  1 15:16:35 2022
 """
 from algorithm.algorithm import Algorithm
 from application.application import Application
-from parameterization.parameterization_classes import ParamSet
+from parameters.parameterization_classes import ParamSet
+from Utilities.program_vars import joint_index
 import numpy as np
 import copy
 
@@ -21,16 +22,15 @@ class CMAB(Algorithm):
         
         
     def run(self, app: Application, pset: ParamSet, timestamp:str, randId:str):
-        N = app.getOptionCount()
-        precision = np.power(((N*np.log(2*N*self.T*self.error_prob))/self.T), 1/3)
+        N = pset.get(joint_index, "N")
         groups = self.generate_groups(app, N)
         t = 0
         reward_t = np.zeros(self.T)
         
-        num_groups = int(np.ceil(N/(self.K+1)))
+        num_groups = pset.get(joint_index, "num_groups")
         sorted_groups = np.zeros([num_groups, self.K], dtype = int)
         
-        run_p = RunParams(N, precision, groups, reward_t, sorted_groups, app)
+        run_p = RunParams(pset, groups, reward_t, sorted_groups, app)
         
         for group in range(num_groups):
             run_p.sorted_groups[group] = self.sort_group(group, run_p)
@@ -70,7 +70,7 @@ class CMAB(Algorithm):
     
     def sort_group(self, group_id, run_p):
         r = 1
-        delta_r, n_r = self.get_round_params(r, run_p.N)
+        delta_r, n_r = self.get_round_params(r, run_p.params.get(joint_index, "N"))
 
         n_G = np.zeros(self.K + 1)
         mu_hat_G = np.zeros(self.K + 1)
@@ -85,7 +85,8 @@ class CMAB(Algorithm):
 
             for arm_index in range(self.K + 1):
                 if(arm_index not in sorted_arms):
-                    action = run_p.groups[group_id, :arm_index].tolist() + run_p.groups[group_id, arm_index+1:].tolist()
+                    action = run_p.groups[group_id, :arm_index].tolist() \
+                        + run_p.groups[group_id, arm_index+1:].tolist()
 
                 reward = run_p.getReward(action)
 
@@ -122,8 +123,8 @@ class CMAB(Algorithm):
 
             if(np.max(n_G) > n_r):
                 r += 1
-                delta_r, n_r = self.get_round_params(r, run_p.N)
-                if(delta_r < run_p.precision):
+                delta_r, n_r = self.get_round_params(r, run_p.params.get(joint_index, "N"))
+                if(delta_r < run_p.params.get(joint_index, "precision")):
                     break
 
         UCB = mu_hat_G + delta_r
@@ -142,7 +143,7 @@ class CMAB(Algorithm):
         placed_arms = 0
 
         r_opt = 1
-        delta_opt, n_r_opt = self.get_round_params(r_opt, run_p.N)
+        delta_opt, n_r_opt = self.get_round_params(r_opt, run_p.params.get(joint_index, "N"))
         mu_hat_opt = 0
         n_opt = 0
         
@@ -152,7 +153,8 @@ class CMAB(Algorithm):
         reset_round = True
         if(reset_round):
             r_exc = 1
-            delta_exc, n_r_exc = self.get_round_params(r_exc, run_p.N)
+            delta_exc, n_r_exc = self.get_round_params(r_exc, 
+                               run_p.params.get(joint_index, "N"))
             mu_hat_exc = 0
             n_exc = 0
             reset_round = False
@@ -197,8 +199,8 @@ class CMAB(Algorithm):
                 placed_arms += 1
                 reset_round = True
 
-            elif ( (delta_exc < run_p.precision) and 
-                   (delta_opt < run_p.precision) ):
+            elif ( (delta_exc < run_p.params.get(joint_index, "precision")) and 
+                   (delta_opt < run_p.params.get(joint_index, "precision")) ):
                 if(UCB_exc > UCB_opt):
                     new_opt_arms = new_opt_arms + [to_merge_group[exc_group_itr]]
                     exc_group_itr += 1
@@ -222,7 +224,8 @@ class CMAB(Algorithm):
 
             if(reset_round):
                 r_exc = 1
-                delta_exc, n_r_exc = self.get_round_params(r_exc, run_p.N)
+                delta_exc, n_r_exc = self.get_round_params(r_exc, 
+                                       run_p.params.get(joint_index, "N"))
                 mu_hat_exc = 0
                 n_exc = 0
                 reset_round = False
@@ -231,14 +234,16 @@ class CMAB(Algorithm):
                 exc_group[opt_group_itr] = to_merge_group[exc_group_itr] 
 
             if( (n_exc > n_r_exc) and
-                (delta_exc > run_p.precision) ):
+                (delta_exc > run_p.params.get(joint_index, "precision")) ):
                 r_exc += 1
-                delta_exc, n_r_exc = self.get_round_params(r_exc, run_p.N)
+                delta_exc, n_r_exc = self.get_round_params(r_exc, 
+                                       run_p.params.get(joint_index, "N"))
 
             if( (n_opt > n_r_opt) and
-                (delta_opt > run_p.precision) ):
+                (delta_opt > run_p.params.get(joint_index, "precision")) ):
                 r_opt += 1
-                delta_opt, n_r_opt = self.get_round_params(r_opt, run_p.N)
+                delta_opt, n_r_opt = self.get_round_params(r_opt, 
+                                       run_p.params.get(joint_index, "N"))
 
 
         return new_opt_arms
@@ -247,9 +252,8 @@ class CMAB(Algorithm):
         ...
 
 class RunParams:
-    def __init__(self, N, precision, groups, reward_t, sorted_groups, app):
-        self.N = N
-        self.precision = precision
+    def __init__(self, params, groups, reward_t, sorted_groups, app):
+        self.params = params
         self.groups = groups
         self.t = 0
         self.reward_t = reward_t

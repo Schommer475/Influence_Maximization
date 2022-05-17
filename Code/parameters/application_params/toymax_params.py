@@ -5,7 +5,7 @@ Created on Wed May 11 19:47:41 2022
 @author: Tim Schommer
 """
 
-num_choices = 4
+num_choices = 10
 
 def validateSolo(dat):
     data = dat["params"]
