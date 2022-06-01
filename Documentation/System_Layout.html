@@ -89,6 +89,7 @@
                             <ul>
                                 <li><a href="#global_names">3.8.1 global_names.py</a></li>
                                 <li><a href="#program_vars">3.8.2 program_vars.py</a></li>
+                                <li><a href="#name_generation">3.8.3 name_generation.py</a></li>
                             </ul>
                         </li>
                         <li><a href="#compilation">3.9 compilation</a></li>
@@ -477,15 +478,15 @@
                             <ul>
                                 <li>
                                     <h4 id="global_names">3.8.1 global_names.py</h4>
-                                    <py>
+                                    <p>
                                         This file specifies the file paths used for accessing various parts of the 
                                         system, such as the Resources directory. It also contains the file names for 
                                         the most commonly used resource files.
-                                    </py>
+                                    </p>
                                 </li>
                                 <li>
                                     <h4 id="program_vars">3.8.2 program_vars.py</h4>
-                                    <py>
+                                    <p>
                                         This file specifies the values of global variables used by the system 
                                         that are not run parameters. Such as the numerical indices that should be 
                                         associated with globals, applications, algorithms, or the joint between 
@@ -493,7 +494,14 @@
                                         is being worked with.) Another example is the string that should be used 
                                         to separate parameter values in file paths when they are not being separated
                                         by a file break.
-                                    </py>
+                                    </p>
+                                </li>
+                                <li>
+                                    <h4 id="name_generation">3.8.3 name_generation.py</h4>
+                                    <p>
+                                        This file contains functions for obtaining a formatted timestamp and 
+                                        random id, for use when creating output files.
+                                    </p>
                                 </li>
                             </ul>
                         </li>

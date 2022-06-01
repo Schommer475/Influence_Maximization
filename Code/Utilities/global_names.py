@@ -1,3 +1,4 @@
+from importlib.metadata import files
 import os
 
 files_dir = os.path.join("..","Files")
@@ -13,9 +14,9 @@ registered_namespace = os.path.join(namespace,"registered_items.json")
 application_namespace = os.path.join(namespace,"ApplicationNames")
 algorithm_namespace = os.path.join(namespace,"AlgorithmNames")
 joint_namespace = os.path.join(namespace,"JointNames")
-temp_dir = os.path.join("..", "Files", "Temporary","Created")
-process_temp = os.path.join("..", "Files", "Temporary","Process")
-logging = os.path.join("..", "Files", "Temporary","Logs")
+temp_dir = os.path.join(files_dir, "Temporary","Created")
+process_temp = os.path.join(files_dir, "Temporary","Process")
+logging = os.path.join(files_dir, "Temporary","Logs")
 
 
 facebook_network = "facebook_network.txt"
