@@ -1,0 +1,81 @@
+<html>
+    <head>
+
+        <style>
+            li {
+                margin: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Terminology</h1>
+            <p>Explanation</p>
+        </div>
+        <div>
+            <ul>
+                <li id="app_alg_name">
+                    <b>algorithm name/application name</b>: This is the name by which an algorithm or application 
+                    is identified throughout the system. It is the name that will appear as the name of the file 
+                    that the application/algorithm is defined in, as well as the name that will appear on 
+                    <a href="#namespace">namespace</a> files that refer to it and within the file paths of experiment 
+                    result files. <br>
+                    If you define a class to encompass the behavior of the application or algorithm, this may also 
+                    be the name of the class, but it does not have to be. For example, the Influence Maximization 
+                    application is implemented using a class named Im, however, the actual application name is im 
+                    (names are case-sensitive).
+                </li>
+                <li id="base_file_name">
+                    <b>base file name</b>: This refers to the name that a file would have if you were to strip the 
+                    path of all the information (and separators in between) that identifies experimental parameters 
+                    and the individual run. If there were a <a href="#path_separator">path separator</a> after the 
+                    last parameter, this would be the actual name of the file. Most of the time, this will simply 
+                    be 'results.pkl'. However, if the run produced intermediate files that it used in its calculations, 
+                    or simply wished to produce additional output files, they would use different base file names 
+                    in order to differentiate themselves.
+                </li>
+                <li id="basic_separator">
+                    <b>basic separator</b>: Alternately referred to as basic_separator. This is a string or character 
+                    that is used to separate parameters or other elements within the file paths of result files 
+                    when the path is not broken into a new directory between the two elements.<br>
+                    basic_separator may also refer to the variable named basic_separator, defined in 
+                    Code/Utilities/program_vars.py, which is used to provide the value of the basic separator.<br>
+                    At the time of writing, this value is the underscore character '_'.<br>
+                </li>
+                <li id="joint">
+                    <b>joint</b>: This term is used as a catch all for features or other items that pertain to both 
+                    applications and algorithms.<br> 
+                    For instance, within the system that handles parameters, parameters 
+                    whose values are calculated using information from both the application and the algorithm and 
+                    thus cannot be stored in either, are referred to as 'joint parameters'.<br>
+                    As another example, within the <a href="#namespace">namespace</a> system, experiment result files are 
+                    identified by the parameters of the experiment that produced them. However, files can also 
+                    be identified using a couple of values that are unique to the run, in order to allow storing 
+                    result files of multiple runs with the same experimental parameters. How the system is configured 
+                    to use these run identifying values within a path is customizable at the level of which application 
+                    is paired with which algorithm in the experiment. Since this configuration is determined based on 
+                    both the application and the algorithm, it is referred to using the term 'joint'. As are the files 
+                    used to specify this configuration, the path sections generated using the configuration, etc.
+                </li>
+                <li id="namespace">
+                    <b>namespace</b>: This term is used to refer to the configuration of the file paths for 
+                    result files produced by experiments. The subsystem that computes the paths for new experiment 
+                    result files using the configuration and handles changing the paths of existing files 
+                    to match a new configuration is referred to as the 'namespace system'. The files that specify 
+                    aspects of the configuration are known as 'namespace files'.
+                </li>
+                <li id="path_separator">
+                    <b>path separator</b>: This term refers to the, system dependent, character that is used 
+                    within the string representation of file paths to indicate a break between a directory and 
+                    its contents. In Unix systems, this character is '/'. When the system talks about changing
+                    or defining the structure of the file paths, it frequently does so by talking about how the 
+                    string representation of the path would change. So, when it talks about setting whether or not 
+                    "a path separator should appear" at a certain point, it is actually talking about whether or 
+                    not the path should be broken into directory and contents at that location. <br>
+                    When writing examples for documentation and usage information, the character '/' is used 
+                    for the path separator, regardless of whether that is what your system would use or not.
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

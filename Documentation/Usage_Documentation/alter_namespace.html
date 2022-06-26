@@ -1,0 +1,627 @@
+<html>
+    <head>
+        <title>Alter Namespace Interface</title>
+    </head>
+    <body>
+        <div>
+            <h1>alter_namespace.py</h1>
+            <p>
+                alter_namespace.py is a Python file that serves as an interface to enable the user to 
+                change the configuration of parts of the <a href="./terminology.html#namespace">namespace</a>. It also 
+                enables the user to obtain information about the current configuration of parts of the 
+                <a href="./terminology.html#namespace">namespace</a>, 
+                to register and unregister algorithms and applications from the 
+                <a href="./terminology.html#namespace">namespace</a> system's list of applications and algorithms, 
+                as well as to see the lists of currently registered applications and algorithms.<br>
+                <br>
+                Running alter_namespace.py without any arguments will cause usage information 
+                to be printed to the console.<br>
+                <br>
+                alter_namespace.py supports several commands, each of which has its own set of accepted and 
+                required arguments. Each command is identified by both a number and a name. <br>
+                To run a command, run alter_namespace.py and supply the first argument as '-' followed by either 
+                of the command's identifiers. The remaining arguments should be any arguments you wish to supply 
+                for the command you are calling. Arguments passed to commands can appear in any order.<br>
+                <b>Example:</b> The invert command is identified by both the name invert and the number 0. Additionally, 
+                the only argument it accepts is optional. If we were to run the command without any additional arguments, 
+                the arguments we pass when running alter_namespace.py could be either of:
+                <ul>
+                    <li>-0</li>
+                    <li>-invert</li>
+                </ul>
+                All together, when running from the command line (using python3 in the examples), this would be:
+                <ul>
+                    <li>python3 alter_namespace.py -0</li>
+                    <li>python3 alter_namespace.py -invert</li>
+                </ul>
+            </p>
+            <p>
+                <b>IMPORTANT NOTE:</b> The changes performed on the configuration of file paths by using this 
+                interface are committed to version control. This feature is provided in order to enable users to 
+                easily clone the project and run experiments on remote machines and computing clusters. 
+                However, if multiple users have clones of the project with their own result files, changes 
+                that one user makes to the configuration and pushes will be copied the next time the other user 
+                performs a git pull, but changes to the file system resulting from the configuration changes will 
+                not be copied. To work around this, users should either coordinate when they change configurations, 
+                or use separate branches for running experiments.
+            </p>
+            <div>
+                <h2>Table of Contents</h2>
+                <ul style="list-style: none;">
+                    <li><a href="#invert">0 invert</a></li>
+                    <li><a href="#timestamp">1 timestamp</a></li>
+                    <li><a href="#randId">2 randId</a></li>
+                    <li><a href="#joint-break">3 joint-break</a></li>
+                    <li><a href="#swap">4 swap</a></li>
+                    <li><a href="#break">5 break</a></li>
+                    <li><a href="#add">6 add</a></li>
+                    <li><a href="#remove">7 remove</a></li>
+                    <li><a href="#info">8 info</a></li>
+                    <li><a href="#list">9 list</a></li>
+                    <li><a href="#register">10 register</a></li>
+                    <li><a href="#unregister">11 unregister</a></li>
+                </ul>
+            </div>
+            <div>
+                <h2>Commands</h2>
+                <ol start="0">
+                    <li id="invert">
+                        <h3>invert</h3>
+                        <p>
+                            This command changes the order in which the path parts for applications and algorithms 
+                            appear.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <ul>
+                                <li>
+                                    (optional) <b>app</b> or <b>1</b> to indicate that applications should go first, 
+                                    <b>alg</b> or <b>2</b> to indicate that algorithms should go first.<br>
+                                    This argument is used to indicate which of the application and algorithm parts 
+                                    should appear first, rather than just flipping them. Use if you are unsure 
+                                    which is currently appearing first in file paths.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="timestamp">
+                        <h3>timestamp</h3>
+                        <p>This command changes whether or not a timestamp is used in the 
+                            <a href="terminology.html#joint">joint</a> section of the file path for a given 
+                            application-algorithm pair.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <ul>
+                                <li>
+                                    (required) <b>--app=&ltvalue&gt</b>: This argument specifies the application 
+                                    part of the application-algorithm pair for which timestamp usage should be 
+                                    toggled.<br>
+                                    &ltvalue&gt should be replaced by an 
+                                    <a href="terminology.html#app_alg_name">application name</a> or <b>-all</b>. 
+                                    Using -all indicates that the timestamp toggle operation should be performed 
+                                    for every pairing created by matching all <a href="#register">registered</a> 
+                                    applications with the value(s) indicated by the --alg= argument.
+                                </li>
+                                <li>
+                                    (required) <b>--alg=&ltvalue&gt</b>: This argument specifies the algorithm 
+                                    part of the application-algorithm pair for which timestamp usage should be 
+                                    toggled.<br>
+                                    &ltvalue&gt should be replaced by an 
+                                    <a href="terminology.html#app_alg_name">algorithm name</a> or <b>-all</b>. 
+                                    Using -all indicates that the timestamp toggle operation should be performed 
+                                    for every pairing created by matching all <a href="#register">registered</a> 
+                                    algorithms with the value(s) indicated by the --app= argument.
+                                </li>
+                                <li>
+                                    (required) <b>--default=&ltvalue&gt</b>: This argument serves a different purpose,
+                                    depending on whether a timestamp is being added or removed.<br>
+                                    If a timestamp is being added, &ltvalue&gt is the timestamp that is assigned to 
+                                    already existing files that do not yet have a timestamp.<br>
+                                    If a timestamp is being removed, of the currently existing experiment result 
+                                    files, only those whose timestamp matches &ltvalue&gt (if any) will be kept. The 
+                                    rest will be deleted.<br>
+                                    &ltvalue&gt should be replaced by a timestamp with second level precision.
+                                </li>
+                                <li>
+                                    (optional) <b>--fixed=&ltvalue&gt</b>: This argument is used to specify that 
+                                    timestamp usage should <i>only</i> be turned on or <i>only</i> be turned off, 
+                                    as opposed to being toggled. This is useful when setting timestamp settings for 
+                                    multiple application-algorithm pairs at once, where some may have different 
+                                    values for their current setting.<br>
+                                    Valid values are <b>true</b> to use timestamps or <b>false</b> to not use 
+                                    timestamps.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="randId">
+                        <h3>randId</h3>
+                        <p>This command changes whether or not a random ID is used in the 
+                            <a href="terminology.html#joint">joint</a> section of the file path for a given 
+                            application-algorithm pair.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <ul>
+                                <li>
+                                    (required) <b>--app=&ltvalue&gt</b>: This argument specifies the application 
+                                    part of the application-algorithm pair for which random ID usage should be 
+                                    toggled.<br>
+                                    &ltvalue&gt should be replaced by an 
+                                    <a href="terminology.html#app_alg_name">application name</a> or <b>-all</b>. 
+                                    Using -all indicates that the random ID toggle operation should be performed 
+                                    for every pairing created by matching all <a href="#register">registered</a> 
+                                    applications with the value(s) indicated by the --alg= argument.
+                                </li>
+                                <li>
+                                    (required) <b>--alg=&ltvalue&gt</b>: This argument specifies the algorithm 
+                                    part of the application-algorithm pair for which random ID usage should be 
+                                    toggled.<br>
+                                    &ltvalue&gt should be replaced by an 
+                                    <a href="terminology.html#app_alg_name">algorithm name</a> or <b>-all</b>. 
+                                    Using -all indicates that the random ID toggle operation should be performed 
+                                    for every pairing created by matching all <a href="#register">registered</a> 
+                                    algorithms with the value(s) indicated by the --app= argument.
+                                </li>
+                                <li>
+                                    (required) <b>--default=&ltvalue&gt</b>: This argument serves a different purpose,
+                                    depending on whether a random ID is being added or removed.<br>
+                                    If a random ID is being added, &ltvalue&gt is the random ID that is assigned to 
+                                    already existing files that do not yet have a random ID.<br>
+                                    If a random ID is being removed, of the currently existing experiment result 
+                                    files, only those whose random ID matches &ltvalue&gt (if any) will be kept. The 
+                                    rest will be deleted.<br>
+                                    &ltvalue&gt should be replaced by an eight digit random ID.
+                                </li>
+                                <li>
+                                    (optional) <b>--fixed=&ltvalue&gt</b>: This argument is used to specify that 
+                                    random ID usage should <i>only</i> be turned on or <i>only</i> be turned off, 
+                                    as opposed to being toggled. This is useful when setting random ID settings for 
+                                    multiple application-algorithm pairs at once, where some may have different 
+                                    values for their current setting.<br>
+                                    Valid values are <b>true</b> to use random IDs or <b>false</b> to not use 
+                                    random IDs.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="joint-break">
+                        <h3>joint-break</h3>
+                        <p>This command changes whether or not a 
+                            <a href="terminology.html#path_separator">path separator</a> or a 
+                            <a href="terminology.html#basic_separator">basic separator</a> is used at the end of the 
+                            <a href="terminology.html#joint">joint</a> section of the file path for a given 
+                            application-algorithm pair. <b>Note that this setting only takes effect if at least one 
+                            of a timestamp and a random ID is in use by the pair.</b>
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <ul>
+                                <li>
+                                    (required) <b>--app=&ltvalue&gt</b>: This argument specifies the application 
+                                    part of the application-algorithm pair for which 
+                                    <a href="terminology.html#path_separator">path separator</a> usage should be 
+                                    toggled.<br>
+                                    &ltvalue&gt should be replaced by an 
+                                    <a href="terminology.html#app_alg_name">application name</a> or <b>-all</b>. 
+                                    Using -all indicates that the 
+                                    <a href="terminology.html#path_separator">path separator</a> toggle operation 
+                                    should be performed for every pairing created by matching all 
+                                    <a href="#register">registered</a> applications with the value(s) indicated 
+                                    by the --alg= argument.
+                                </li>
+                                <li>
+                                    (required) <b>--alg=&ltvalue&gt</b>: This argument specifies the algorithm 
+                                    part of the application-algorithm pair for which 
+                                    <a href="terminology.html#path_separator">path separator</a> usage should be 
+                                    toggled.<br>
+                                    &ltvalue&gt should be replaced by an 
+                                    <a href="terminology.html#app_alg_name">algorithm name</a> or <b>-all</b>. 
+                                    Using -all indicates that the 
+                                    <a href="terminology.html#path_separator">path separator</a> toggle operation 
+                                    should be performed for every pairing created by matching all 
+                                    <a href="#register">registered</a> algorithms with the value(s) indicated 
+                                    by the --app= argument.
+                                </li>
+                                <li>
+                                    (optional) <b>--fixed=&ltvalue&gt</b>: This argument is used to specify that 
+                                    <a href="terminology.html#path_separator">path separator</a> usage should 
+                                    <i>only</i> be turned on or <i>only</i> be turned off, as opposed to being 
+                                    toggled. This is useful when setting 
+                                    <a href="terminology.html#path_separator">path separator</a> settings for 
+                                    multiple application-algorithm pairs at once, where some may have different 
+                                    values for their current setting.<br>
+                                    Valid values are <b>true</b> to use 
+                                    <a href="terminology.html#path_separator">path separators</a> or 
+                                    <b>false</b> to use <a href="terminology.html#basic_separator">basic separators</a>.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="swap">
+                        <h3>swap</h3>
+                        <p>
+                            For an indicated application or algorithm, this command swaps the positions of two of the 
+                            parameters within that application/algorithm's 
+                            <a href="terminology.html#namespace">namespace</a> configuration. Bear in mind that whether 
+                            it is a <a href="terminology.html#path_separator">path separator</a> or a 
+                            <a href="terminology.html#basic_separator">basic separator</a> that follows a parameter 
+                            is tied to the parameter, not the position. So swapping two parameters may change the location 
+                            in which the path is broken into directory and content.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                Exactly one (no more or less) of the first and second arguments listed is expected.<br>
+                                This command requires that two instances of the third argument listed be provided: 
+                                one for each of the swap positions.
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app=&ltvalue&gt</b>: This argument indicates that the parameter 
+                                    swap is being performed on an application with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">application name</a>.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg=&ltvalue&gt</b>: This argument indicates that the parameter 
+                                    swap is being performed on an algorithm with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">algorithm name</a>.
+                                </li>
+                                <li>
+                                    (required x2) One of the parameters to be swapped. This can either be the 
+                                    parameter name, or the index of the parameter within the current configuration.
+                                    Note that the header identifying the application or algorithm is always first 
+                                    in the path section (index 0). As a result, the first parameter index is 1.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="break">
+                        <h3>break</h3>
+                        <p>For an indicated application or algorithm, changes whether it is a 
+                            <a href="terminology.html#path_separator">file path separator</a> or a 
+                            <a href="terminology.html#basic_separator">basic separator</a> that follows 
+                            after the indicated parameter. Note that the presence of a timestamp or random ID 
+                            will overwrite the choice for the last parameter of whatever set of parameters 
+                            appears second and simply use a 
+                            <a href="terminology.html#path_separator">file path separator</a> between that 
+                            parameter and the timestamp and/or random ID.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                Exactly one (no more or less) of the first and second arguments listed is expected.<br>
+                                The third argument is also required.
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app=&ltvalue&gt</b>: This argument indicates that the 
+                                    <a href="terminology.html#path_separator">path separator</a> (path break) toggle 
+                                    operation is being performed on an application with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">application name</a>.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg=&ltvalue&gt</b>: This argument indicates that the 
+                                    <a href="terminology.html#path_separator">path separator</a> (path break) toggle 
+                                    operation is being performed on an algorithm with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">algorithm name</a>.
+                                </li>
+                                <li>
+                                    (required) <b>--at=&ltvalue&gt</b>: This argument indicates the parameter/header that 
+                                    the addition or removal of a 
+                                    <a href="terminology.html#path_separator">path separator</a> should follow.<br>
+                                    &ltvalue&gt should either be the name of the parameter or the index at which 
+                                    it appears in the path segment. For the header that identifies the application 
+                                    or algorithm, you can either use the index (0) or the special token 
+                                    <b>&ltSTART&gt</b>.
+                                </li>
+                                <li>
+                                    (optional) <b>--fixed=&ltvalue&gt</b>: This argument is used to specify that 
+                                    <a href="terminology.html#path_separator">path separator</a> usage should 
+                                    <i>only</i> be turned on or <i>only</i> be turned off, as opposed to being 
+                                    toggled. Use if you are unsure which separator type is currently being used.<br>
+                                    Valid values are <b>true</b> to use 
+                                    <a href="terminology.html#path_separator">path separators</a> or 
+                                    <b>false</b> to use <a href="terminology.html#basic_separator">basic separators</a>.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="add">
+                        <h3>add</h3>
+                        <p>
+                            Inserts a given parameter into paths for the indicated application or algorithm 
+                            at/directly in front of the indicated index/parameter.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                Exactly one (no more or less) of the first and second arguments listed is expected.<br>
+                                Every remaining argument aside from the last one is required.
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app=&ltvalue&gt</b>: This argument indicates that the 
+                                    given parameter should be inserted into the path for an application with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">application name</a>.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg=&ltvalue&gt</b>: This argument indicates that the 
+                                    given parameter should be inserted into the path for an algorithm with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">algorithm name</a>.
+                                </li>
+                                <li>
+                                    (required) <b>--at=&ltvalue&gt</b>: The parameter/position at/in front of which the given parameter 
+                                    should be inserted.<br>
+                                    &ltvalue&gt should either be the name of the parameter in front of which the given parameter 
+                                    should be inserted or the numerical index at which the parameter should be inserted. If it is being 
+                                    added to the end, either the numerical index or the special value <b>&ltEND&gt</b> can be used.
+                                    Note that, since the header identifying the application/algorithm always appears first (index 0), 
+                                    the first valid index is 1. 
+                                </li>
+                                <li>
+                                    (required) The name of the parameter to be added to the path. An error will occur if this parameter 
+                                    does not exist in the parameter file for the specified application/algorithm.
+                                </li>
+                                <li>
+                                    (required) <b>--default=&ltvalue&gt</b>: This argument is the parameter value that is assigned to 
+                                    the position the parameter is being added to in already existing files.<br>
+                                    &ltvalue&gt should be replaced by a valid value for the parameter that is appropriate to the 
+                                    experiment setup prior to adding the parameter to the path.
+                                </li>
+                                <li>
+                                    (optional) <b>--sep=&ltvalue&gt</b>: This argument is used to indicate whether a 
+                                    <a href="terminology.html#path_separator">path separator</a> or a 
+                                    <a href="terminology.html#basic_separator">basic separator</a> should follow the 
+                                    inserted parameter.
+                                    Valid values are <b>true</b> to use 
+                                    <a href="terminology.html#path_separator">path separators</a> or 
+                                    <b>false</b> to use <a href="terminology.html#basic_separator">basic separators</a>.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="remove">
+                        <h3>remove</h3>
+                        <p>
+                            Removes a given parameter from the paths for the indicated application or algorithm. 
+                            The parameter to remove can be identified using either name or numerical index.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                Exactly one (no more or less) of the first and second arguments listed is expected.<br>
+                                Every remaining argument is also required.
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app=&ltvalue&gt</b>: This argument indicates that the 
+                                    given parameter should be removed from the path for an application with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">application name</a>.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg=&ltvalue&gt</b>: This argument indicates that the 
+                                    given parameter should be removed from the path for an algorithm with the 
+                                    <a href="terminology.html#app_alg_name">name</a> &ltvalue&gt.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">algorithm name</a>.
+                                </li>
+                                <li>
+                                    (required) The name or the index of the parameter to remove.<br>
+                                    Note that, since the header identifying the application/algorithm always appears first (index 0), 
+                                    the first valid index is 1. 
+                                </li>
+                                <li>
+                                    (required) <b>--default=&ltvalue&gt</b>: This argument is used to specify which files, out of those
+                                    whose paths are affected by the change, should be kept. Files for whom the current value at the 
+                                    path position of the parameter to be removed matches the given default value will be kept.<br>
+                                    <b>For example:</b><br>
+                                    If a path segment prototype is alg-etcg/&ltseed_set_size&gt/&lttime_horizon&gt/<br>
+                                    Now if the following are both path segments of existing files:
+                                    <ul>
+                                        <li>alg-etcg/10/10000/</li>
+                                        <li>alg-etcg/10/20000/</li>
+                                    </ul>
+                                    If you are removing time_horizon and the following argument is given: --default=10000 then 
+                                    the first file will be kept and the path segment will become alg-etcg/10/<br>
+                                    The second file will be discarded.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="info">
+                        <h3>info</h3>
+                        <p>
+                            This command produces information on the current 
+                            <a href="terminology.html#namespace">namespace</a> configuration one or more applications, 
+                            algorithms, or a <a href="terminology.html#joint">joint</a> sections for one or more
+                            application-algorithm pairs.
+                        </p>
+                        <p>
+                            <h4>Output</h4>
+                            Different formats of output are produced dependent on whether information is being 
+                            printed on applications/algorithms or on <a href="terminology.html#joint">joint</a> 
+                            sections.<br>
+                            <br>
+                            For each application or algorithm being printed, the format begins with 
+                            a line containing the application or algorithm name. The next line contains the 
+                            symbol <b>&ltSTART&gt</b>followed by a space, a <b>/</b> if the separator associated 
+                            with the first header is a <a href="terminology.html#path_separator">path separator</a>,
+                            otherwise a <b>_</b> will appear to represent a 
+                            <a href="terminology.html#basic_separator">basic separator</a>, this is then followed 
+                            by another space.<br>
+                            Then, for every experiment parameter that will appear in the file path
+                            (in the order they appear in the path), it will print the name of the parameter along 
+                            with either <b>/</b> or <b>_</b>, surrounded by spaces.<br>
+                            After the final separator character and its following space, the symbol 
+                            <b>&ltEND&gt</b> will be printed.<br>
+                            <b>Example:</b>
+                            etcg:<br>
+                            &ltSTART&gt / time_horizon _ seed_set_size / &ltEND&gt<br>
+                            <br>
+                            For each <a href="terminology.html#joint">joint</a> section being printed there will 
+                            be a line with <b>
+                            <a href="terminology.html#app_alg_name">application_name - algorithm_name</a>:</b><br>
+                            The next line will contain one of four different values, depending on the current 
+                            configuration: <b>Timestamp</b> if the configuration uses only a timestamp, 
+                            <b>Random ID</b> if the configuration uses only a random id, 
+                            <b>Timestamp _ Random ID</b> if the configuration uses both a timestamp and a random id,
+                            or <b>Nothing</b> if the configuration uses neither a timestamp nor a random id.<br>
+                            The value that is printed is followed by a space and then <b>/</b> 
+                            (if the <a href="terminology.html#joint">joint</a> section is to be followed by a 
+                            <a href="terminology.html#path_separator">path separator</a>) or _ 
+                            (if the <a href="terminology.html#joint">joint</a> section is to be followed by a 
+                            <a href="terminology.html#basic_separator">basic separator</a>).<br>
+                            <b>Example 1:</b><br>
+                            im - etcg:<br>
+                            Timestamp /<br>
+                            <b>Example 2:</b><br>
+                            im - cmab:<br>
+                            Random ID _<br>
+                            <b>Example 3:</b><br>
+                            im - dart:<br>
+                            Timestamp _ Random ID _<br>
+                            <b>Example 4:</b><br>
+                            im - csar:<br>
+                            Nothing /<br>
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                At least one of the two listed arguments must be present. If only one is 
+                                present, information on either applications or on algorithms will be 
+                                printed. If both are present, it will be information on 
+                                <a href="terminology.html#joint">joint</a> configurations.
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app-&ltvalue&gt</b>:<br> 
+                                    If this argument is the only one used, it specifies that configuration 
+                                    information should be provided for the application(s) indicated by this argument.<br>
+                                    <br>
+                                    If the --alg= argument is also provided, then the application(s) indicated by this 
+                                    argument will be exhaustively paired with the algorithm(s) indicated by the --alg= 
+                                    argument and information about the <a href="terminology.html#joint">joint</a> 
+                                    configurations of each pair will be provided.<br>
+                                    <br>
+                                    &ltvalue&gt should either be the 
+                                    <a href="terminology.html#app_alg_name">name</a> of an application, or <b>-all</b>. 
+                                    If the value is <b>-all</b>, this argument indicates that every application 
+                                    <a href="#register">registered</a> in the 
+                                    <a href="terminology.html#namespace">namespace</a> systemshould be used.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg-&ltvalue&gt</b>:<br> 
+                                    If this argument is the only one used, it specifies that configuration 
+                                    information should be provided for the algorithm(s) indicated by this argument.<br>
+                                    <br>
+                                    If the --app= argument is also provided, then the algorithm(s) indicated by this 
+                                    argument will be exhaustively paired with the applications(s) indicated by the 
+                                    --app= argument and information about the 
+                                    <a href="terminology.html#joint">joint</a> 
+                                    configurations of each pair will be provided.<br>
+                                    <br>
+                                    &ltvalue&gt should either be the 
+                                    <a href="terminology.html#app_alg_name">name</a> of an algorithm, or <b>-all</b>. 
+                                    If the value is <b>-all</b>, this argument indicates that every algorithm 
+                                    <a href="#register">registered</a> in the 
+                                    <a href="terminology.html#namespace">namespace</a> systemshould be used.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="list">
+                        <h3>list</h3>
+                        <p>
+                            Lists the <a href="terminology.html#app_alg_name">names</a> of all applications, algorithms, or both 
+                            that are <a href="#register">registered</a> with the <a href="terminology.html#namespace">namespace</a>
+                            system.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <ul>
+                                <li>
+                                    (required) This argument is a value to indicate whether registered applications, algorithms, 
+                                    or both should be listed. Valid values are <b>app</b> or <b>1</b> to indicate applications,
+                                    <b>alg</b> or <b>2</b> to indicate algorithms, or <b>both</b> or <b>3</b> to indicate both.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="register">
+                        <h3>register</h3>
+                        <p>
+                            Adds the indicated application/algorithm to the 
+                            <a href="terminology.html#namespace">namespace</a> system's list of all 
+                            applications/algorithms. These lists are only used by only used by commands 
+                            with arguments that accept <b>-all</b> as a value. The <b>-all</b> value 
+                            indicates that the operation should be performed for all applications or 
+                            algorithms that appear in the corresponding list.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                Exactly one (no more or less) of the arguments listed is expected.<br>
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app=&ltvalue&gt</b>: This argument indicates that &ltvalue&gt 
+                                    should be added to the list of all applications.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">application name</a>.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg=&ltvalue&gt</b>: This argument indicates that &ltvalue&gt 
+                                    should be added to the list of all algorithms.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">algorithm name</a>.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li id="unregister">
+                        <h3>unregister</h3>
+                        <p>
+                            Removes the indicated application/algorithm from the 
+                            <a href="terminology.html#namespace">namespace</a> system's list of all 
+                            applications/algorithms. These lists are only used by only used by commands 
+                            with arguments that accept <b>-all</b> as a value. The <b>-all</b> value 
+                            indicates that the operation should be performed for all applications or 
+                            algorithms that appear in the corresponding list.
+                        </p>
+                        <div>
+                            <h4>Arguments</h4>
+                            <p>
+                                Special Requirements:<br> 
+                                Exactly one (no more or less) of the arguments listed is expected.<br>
+                            </p>
+                            <ul>
+                                <li>
+                                    (semi-required) <b>--app=&ltvalue&gt</b>: This argument indicates that &ltvalue&gt 
+                                    should be removed from the list of all applications.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">application name</a>.
+                                </li>
+                                <li>
+                                    (semi-required) <b>--alg=&ltvalue&gt</b>: This argument indicates that &ltvalue&gt 
+                                    should be removed from the list of all algorithms.<br>
+                                    &ltvalue&gt should be an <a href="terminology.html#app_alg_name">algorithm name</a>.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </body>
+</html>

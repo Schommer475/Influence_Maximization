@@ -524,13 +524,33 @@
                                 item in the "headers" list that appears at the same index. If the 
                                 boolean is true, the corresponding parameter value will be followed 
                                 by a path separator in the file path. If the boolean is false, the corresponding parameter 
-                                value will be followed by the basic separator string in the file path.
+                                value will be followed by the basic separator string in the file path.<br>
+                                An example for the file Files/Namespace/AlgorithmNames/etcg.json might be:<pre>
+{
+    "headers":["alg-etcg", "time_horizon", "seed_set_size"],
+    "separators":[false, true, false]
+}
+                                </pre>
                             </p>
                         </div>
                         <div id="joint_namespace">
                             <h5>Experiment Identifier (Joint) Configuration Files</h5>
                             <p>
-
+                                A configuration file for the files that fall under a particular application and algorithm should be a JSON 
+                                (See <a href="#json_primer">Primer on JSON Files</a>) file 
+                                'Files/Namespace/JointNames/&ltapplication name&gt_&ltalgorithm name&gt.json'. <br>
+                                For instance: Files/Namespace/JointNames/im_etcg.json<br>
+                                If the necessary folder does not already exist, you will need to create it.
+                                The top level object should contain three variables, all of which are booleans: 
+                                <ul>
+                                    <li>
+                                        "use_timestamp": If true, a timestamp will be used to identify files.
+                                    </li>
+                                    <li>"use_randID": If true, a random ID will be used to identify files.</li>
+                                    <li>"sep_after": If true, a file separator will appear in the path after the included identifying information. Otherwise 
+                                        a basic separater will appear.
+                                    </li>
+                                </ul>
                             </p>
                         </div>
                         <div id="ordering">
@@ -551,13 +571,74 @@
                 <div id="config_information">
                     <h3>Current Path Configuration Information</h3>
                     <p>
-
+                        To obtain information on the way paths are currently configured, you will want to use the 
+                        interface defined in 'alter_namespace.py'.<br>
+                        alter_namespace.py offers the following commands for obtaining information on the current 
+                        configurations:<br>
+                        <ol>
+                            <li>
+                                Info: The info command is used to print the current configuration of path 
+                                segments for files that fall under a given application or algorithm or the information 
+                                for identifying individual runs for files that fall under an application-algorithm 
+                                pair. The output format is an approximation of the file path segment with a few changes.
+                                <ol>
+                                    <li>
+                                        The names of parameters are used instead of parameter values.
+                                    </li>
+                                    <li>
+                                        There is space between every header and separator.
+                                    </li>
+                                    <li>
+                                        For applications and algorithms, the first header (eg: app-im) is replaced by 
+                                        the special symbol &ltSTART&gt and the last separator is followed by the 
+                                        special symbol &ltEND&gt.
+                                    </li>
+                                    <li>
+                                        For joint sections, if neither a timestamp nor a random id are used, the 
+                                        term Nothing appears before whatever separator would follow if something 
+                                        were used.
+                                    </li>
+                                </ol>
+                                <b>Application/Algorithm Example:</b> 
+                                &ltSTART&gt _ seed_set_size / time_horizon _ &ltEND&gt<br>
+                                <b>Joint Example 1:</b> Timestamp _<br>
+                                <b>Joint Example 2:</b> Timestamp _ Random ID /<br>
+                                <b>Joint Example 3:</b>Nothing /<br>
+                                To run this command, run alter_namespace.py from the Code directory and provide 
+                                either '-info' or '-8' as the mode indicator. You will also need to provide an application,
+                                an algorithm, or both (for information identifying runs that fall under the pair) to indicate 
+                                
+                            </li>
+                            <li>
+                                List: The list command is used to print off a list of the names of all registered
+                                applications, algorithms, or both. The registered applications and algorithms 
+                                are those that will be used when a relevant command is run with '-all' given as the application 
+                                and/or algorithm.<br>
+                                To run this command, run alter_namespace.py from the Code directory and provide 
+                                either '-list' or '-9' as the mode indicator. You will also need to indicate if 
+                                you want the applications, algorithms, or both listed. Passing a value of either 
+                                'app' or '1' will cause it to list the registered applications. Passing a value of either 
+                                'alg' or '2' will cause it to list the registered algorithms. And passing a value of either 
+                                'both' or '3' will cause it to list the both the registered applications and the 
+                                registered algorithms. <br>
+                                <b>Example 1:</b> alter_namespace.py -list app <br>
+                                Running this with python will list all registered applications.<br>
+                                <b>Example 2:</b> alter_namespace.py -9 3<br>
+                                Running this with python will list all registered applications and algorithms.<br>
+                            </li>
+                        </ol>
                     </p>
                 </div>
                 <div id="altering_namespace">
                     <h3>Changing Path Configurations</h3>
                     <p>
-                        
+                        To change the way paths are currently configured and register or unregister applications and 
+                        algorithms, you will want to use the interface defined in 'alter_namespace.py'.<br>
+                        alter_namespace.py offers the following commands for changing configurations and 
+                        registering/unregistering applications and algorithms:<br>
+                        <ol>
+                            <li></li>
+                        </ol>
                     </p>
                 </div>
             </div>
