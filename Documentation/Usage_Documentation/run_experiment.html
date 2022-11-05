@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <title>Run Experiment Interface</title>
+    </head>
+    <body>
+        <h1>run_experiment.py</h1>
+        <p>
+            run_experiment.py is a Python file used to run experiments that are specified using an <a href="input_files.html">input file</a>.
+            Note that this file expects to be run with the Code directory as the current working directory.
+        </p>
+        <div>
+            This function expects one argument, which must appear first, and an option which may optionally appear after the argument.
+            <h2>Argument and Option</h2>
+            <ol>
+                <li>
+                    <b>input file</b>
+                    <p>
+                        This is the path, relative to the current working directory, to the <a href="input_files.html">input file</a> that should be used 
+                        to specify experiments to run.
+                    </p>
+                </li>
+                <li>
+                    <b>-s &ltseed&gt</b>:
+                    <p>
+                        This option allows the user to specify a random seed that should be set before starting any part of the process to load and run the experiments.
+                        This is used to allow experiments to be reproducable and resumable by using a log of which experiments have and haven't
+                        completed. If this option is not provided, the system will randomly choose a seed.<br>
+                        The seed the system is using will always be outputted to the user before beginning.<br>
+                        <br>
+                        <b>Important note:</b> The log files, located in Files/Temporary/Logs, are only used to be able to resume an interrupted set of experiments where
+                        they left off. For memory efficiency and to reduce the chance of randomly choosing a seed that already matches one on a log file, these files should be 
+                        deleted every so often when you do not need them anymore.
+                    </p>
+                </li>
+            </ol>
+            <h2>Output Files</h2>
+            <p>
+                Each experiment iteration also produces an output file (location determined by the configuration
+                of the <a href="terminology.html#namespace">namespace system</a>) with a 
+                <a href="terminology.html#base_file_name">base file name</a> of <b>results.pkl</b>. The file
+                contains an object with two fields: <b>params</b>, contains a serialization of the experiment's
+                ParamSet object and can be passed to ParamSet's <a href="ParamSet.html#fromDict">fromDict</a>
+                method, and <b>results</b>, contains whatever data was returned from running the Algorithm's 
+                <b>run</b> method.
+            </p>
+        </div>
+    </body>
+</html>

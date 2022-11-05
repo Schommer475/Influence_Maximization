@@ -1,0 +1,84 @@
+
+            
+<head>
+    <title>Globals</title>
+    <style>
+        ul {list-style: none;}
+    </style>
+</head>
+<body>
+    <h1>Globals</h1>
+    <p>
+        Global variables used when running experiments, as well as their default values,
+        are defined in Code/parameters/global_parameters.py<br>
+        As of the time of writing, the variables currently available are:
+    </p>
+    <ul>
+        <li>
+            <b>num_cores</b>:
+            <ul>
+                <li><b>type:</b> integer</li>
+                <li><b>minimum value:</b> 1</li>
+                <li>
+                    <b>description:</b>
+                    <p>
+                        The number of processing cores to be used when running experiments and logging results.
+                    </p>
+                </li>
+                <li>
+                    <b>default:</b>
+                    <p>
+                        The system will attempt to calculate the number of cpus available to it and use all of them.
+                    </p>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <b>num_runs</b>:
+            <ul>
+                <li><b>type:</b> integer</li>
+                <li><b>minimum value:</b> 1</li>
+                <li>
+                    <b>description:</b>
+                    <p>
+                        The number of times each experiment configuration is to be run.
+                    </p>
+                </li>
+                <li>
+                    <b>default:</b>
+                    <p>
+                        1
+                    </p>
+                </li>
+            </ul>
+            <li>
+                <b>refresh</b>:
+                <ul>
+                    <li><b>type:</b> boolean</li>
+                    <li>
+                        <b>description:</b>
+                        <p>
+                            When a experiment specification is run more than one time in a given execution, 
+                            it will use the same application and algorithm instances in every run. This means 
+                            that randomized parameters, such as network weights, that are set at the time of 
+                            creation will remain the same. Additionally, if the Application or Algorithm stores
+                            any internal state while running, that state may still remain between runs when running in 
+                            single-threaded mode.<br>
+                            <br>
+                            This variable is passed to a function 'newRun' on the Applications and Algorithms,
+                            which, by default, will cause a user-defined refresh method to be called, where 
+                            users can write any code necessary to reset the state and/or re-initialize 
+                            randomized variables.
+                        </p>
+                    </li>
+                    <li>
+                        <b>default:</b>
+                        <p>
+                            True
+                        </p>
+                    </li>
+                </ul>
+            </li>
+        </li>
+    </ul>
+</body>

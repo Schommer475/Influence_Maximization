@@ -1,0 +1,99 @@
+<html>
+    <head>
+        <title>JSON Primer</title>
+    </head>
+    <body>
+        <div id="json_primer">
+            <h3>Primer on JSON Files</h3>
+            <p>
+                JavaScript Object Notation (JSON) is a format for serializing object data (no functions) as text.
+                All system, logging, and input files used by the system use JSON format, so an overview is provided here.
+            </p>
+            <div>
+                <p>Values in JSON are all one of the following datatypes:</p>
+                <ol>
+                    <li>
+                        <p>
+                            <b>String</b>:
+                            A JSON String functions like a String in most programming languages (sequence of characters surrounded by quotation marks) with one notable rule:
+                            The quotation marks surrounding the sequence of characters MUST be double quotes. So "hello" is a valid JSON String and 'hello' is not.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>number</b>:
+                            Numbers are represented in JSON the same way they are represented in most programming languages. Numbers can be in integer or floating point format,
+                            hexadecimal and other formats are not supported.
+                            <br>
+                            <b>Some examples:</b>
+                            <br>
+                            42
+                            <br>
+                            37.0485
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>boolean</b>:
+                            Boolean values in JSON are represented by the lower-case literals:<br>
+                            true<br>
+                            false<br>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>null</b>: 
+                            Null values are represented with the literal 'null'<br>
+                            <b>For instance:</b><br>
+                            "value":null
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>List</b>:
+                            Lists in JSON are similar to Lists in Python: they consist of a left bracket ([), a right bracket (]), and zero or more comma-separated JSON values
+                            between them.<br>
+                            <b>Example 1:</b><br>
+                            []<br>
+                            <b>Example 2:</b><br>
+                            [true]<br>
+                            <b>Example 3:</b><br>
+                            [false, "hello", null, 42.2, {"greeting":"hola", "age":32}, [45, 38]]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Object</b>:
+                            Objects in JSON are containers for variables, similar to Python dictionaries. They consist of a right curly brace ({), a left curly brace (}),
+                            and zero or more comma-separated JSON variables between them.<br>
+                            <b>Example 1:</b><br>
+                            {}<br>
+                            <b>Example 2:</b><br>
+                            {"alive":true}<br>
+                            <b>Example 3:</b><br>
+                            {"dead":false, "greeting":"hello", "fastest_runner":null, "best_time":42.2, "other":{"greeting":"hola", "age":32}, "friends":["frank", "joe"]}
+                        </p>
+                    </li>
+                </ol>
+            </div>
+            <p>
+                JSON variables are defined using a JSON String for the variable name, followed by a colon (:) as the assignment operator, and then finally a value that is one
+                of the JSON data types. This is similar to how dictionary items are defined in Python when using an initializer string.
+                <br>
+                <b>For instance:</b> "greetings":["hello","hola","aloha"]
+            </p>
+            <p>
+                JSON files are simple text files (.txt) with the extension changed to '.json'. The content of a JSON file
+                is a JSON value that is not assigned to anything.
+                <br>
+                <b>For instance:</b>
+                <br>
+                <pre>{
+"greeting":"hello"
+}
+                </pre>
+                Could be the entire content of a JSON file.
+            </p>
+        </div>
+    </body>
+</html>

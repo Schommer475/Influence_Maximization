@@ -9,8 +9,17 @@
         <h1>Namespace Files</h1>
         <p>
             Namespace files are the files that are used by the <a href="terminology.html#namespace">namespace</a> 
-            system to specify how the file paths for files produced running experiments should be structured.
-            Explain, warn, and point to alter_namespace
+            system to specify how the file paths for files produced running experiments should be structured.<br>
+            Each potential configuration file also has a default setting that is used if that file does not
+            exist.<br>
+            All namespace configuration files are written as JSON files. (See 
+            <a href="json.html">here</a> for a reference
+            on JSON files.) Relevant files and folders mentioned in this guide may or may not 
+            currently exist inside the filesystem, depending on whether or not default values 
+            are being used for different configurations. Changing configurations through the 
+            <a href="alter_namespace.html">alter_namespace.py</a> interface will automatically 
+            create any folders and files needed, if you are creating the files here, you may also 
+            need to create the folders.
         </p>
         <div>
             <h2>Table of Contents</h2>
@@ -22,12 +31,256 @@
         </div>
         <div id="#ordering">
             <h2>Section Ordering</h2>
+            <ul>
+                <li>
+                    <b>description:</b>
+                    <p>
+                        This file determines whether it is application parameters or algorithm 
+                        parameters that will appear first in file paths.
+                    </p>
+                </li>
+                <li>
+                    <b>expected location:</b>
+                    <p>
+                        Files/Namespaces
+                    </p>
+                </li>
+                <li>
+                    <b>expected file name:</b>
+                    <p>
+                        global_name_vars.json
+                    </p>
+                </li>
+                <li>
+                    <b>default:</b>
+                    <p>
+                        The default configuration is for application parameters to appear before algorithm
+                        parameters.
+                    </p>
+                </li>
+                <li>
+                    <b>fields:</b>
+                    <ol>
+                        <li>
+                            <b>app_first</b>:
+                            <ul>
+                                <li><b>type:</b> boolean</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        If this field is set to true, application parameters will appear 
+                                        before algorithm parameters in the file paths. If it is set to false, 
+                                        algorithm parameters will appear before application parameters in 
+                                        file paths.
+                                    </p>
+                                </li>
+                                <li><b>required:</b> true</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
         </div>
         <div id="app_and_alg">
             <h2>Application and Algorithm Files</h2>
+            <ul>
+                <li>
+                    <b>description:</b>
+                    <p>
+                        These files are used to specify the experimental parameters that should 
+                        appear in the file paths for output files of applications and algorithms 
+                        as well as the order they should appear in and whether they should be 
+                        joined together using 
+                        <a href="terminology.html#basic_separator">basic separators</a> or 
+                        <a href="terminology.html#path_separator">path separators</a>.
+                    </p>
+                </li>
+                <li>
+                    <b>expected location:</b>
+                    <p>
+                        <b>Files/Namespaces/ApplicationNames</b> or<br>
+                        <b>Files/Namespaces/AlgorithmNames</b> <br>
+                        depending on which one is being configured.
+                    </p>
+                </li>
+                <li>
+                    <b>expected file name:</b>
+                    <p>
+                        &lt<a href="terminology.html#app_alg_name">application/algorithm name</a>&gt.json
+                    </p>
+                </li>
+                <li>
+                    <b>default:</b>
+                    <p>
+                        The default configuration is to use the 
+                        <a href="terminology.html#app_alg_identifier">application/algorithm identifier</a> 
+                        and have it followed by a <a href="terminology.html#basic_separator">basic separator</a>. 
+                        No other parameters are used.
+                    </p>
+                </li>
+                <li>
+                    <b>fields:</b>
+                    <ol>
+                        <li>
+                            <b>headers</b>:
+                            <ul>
+                                <li><b>type:</b> list</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        List of elements to appear in the file path for files 
+                                        generated using the corresponding application/algorithm.
+                                    </p>
+                                </li>
+                                <li>
+                                    <b>items:</b>
+                                    <ul>
+                                        <li><b>type:</b> string</li>
+                                        <li>
+                                            <b>description:</b>
+                                            <p>
+                                                The first item must be the 
+                                                <a href="terminology.html#app_alg_identifier">application/algorithm identifier</a>,
+                                                any remaining items are names of experimental parameters of the application or algorithm, 
+                                                in the order that they should appear in. If the experimental parameter 
+                                                cannot be directly cast to a string, then it is the name of a variable holding 
+                                                a custom string representation of that parameter.
+                                            </p>
+                                        </li>
+                                        <li><b>example:</b> seed_set_size</li>
+                                    </ul>
+                                </li>
+                                <li><b>required:</b> true</li>
+                                <li>
+                                    <b>Constraints:</b> One or more. (The 
+                                    <a href="terminology.html#app_alg_identifier">application/algorithm identifier</a>
+                                    must be present and must be the first item.)
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <b>separators</b>:
+                            <ul>
+                                <li><b>type:</b> list</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        List of items indicating whether the element at the corresponding 
+                                        index of the headers list should be followed by a 
+                                        <a href="terminology.html#path_separator">path separator</a> or a
+                                        <a href="terminology.html#basic_separator">basic separator</a> 
+                                        in file paths.
+                                    </p>
+                                </li>
+                                <li>
+                                    <b>items:</b>
+                                    <ul>
+                                        <li><b>type:</b> boolean</li>
+                                        <li>
+                                            <b>description:</b>
+                                            <p>
+                                                If true, the element at the corresponding index in the 
+                                                headers list will be followed by a 
+                                                <a href="terminology.html#path_separator">path separator</a>
+                                                in the file path. If false, it will be followed by a 
+                                                <a href="terminology.html#basic_separator">basic separator</a>.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><b>required:</b> true</li>
+                                <li>
+                                    <b>Constraints:</b> Same length as the headers field.
+                                </li>
+                            </ul>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
         </div>
         <div id="joint">
-
+            <h2>Joint Files</h2>
+            <ul>
+                <li>
+                    <b>description:</b>
+                    <p>
+                        These files are used to determine what parameters, if any, will be used to identify files 
+                        from individual runs of a given experimental setup. It also determines whether these parameters, 
+                        if they are used, are a directory containing the files, or if they appear in the file name 
+                        and are separated from the <a href="terminology.html#base_file_name">base file name</a> by a 
+                        <a href="terminology.html#basic_separator">basic separator</a> character.
+                    </p>
+                </li>
+                <li>
+                    <b>expected location:</b>
+                    <p>
+                        Files/Namespaces/JointNames
+                    </p>
+                </li>
+                <li>
+                    <b>expected file name:</b>
+                    <p>
+                        &lt<a href="terminology.html#app_alg_name">application name</a>&gt_&lt<a href="terminology.html#app_alg_name">algorithm name</a>&gt.json
+                    </p>
+                </li>
+                <li>
+                    <b>default:</b>
+                    <p>
+                        The default configuration is for a random ID to be used, no timestamp is used, and the random ID is joined to the 
+                        <a href="terminology.html#base_file_name">base file name</a> with a <a href="terminology.html#basic_separator">basic separator</a> character.
+                    </p>
+                </li>
+                <li>
+                    <b>fields:</b>
+                    <ol>
+                        <li>
+                            <b>use_timestamp</b>:
+                            <ul>
+                                <li><b>type:</b> boolean</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        If this field is set to true, a timestamp with a precision level of seconds will be used to help identify individual runs of a particular 
+                                        experiment setup. The recommendation is to use this when you want to be able to easily identify and sort which batch of runs a result file 
+                                        came from.
+                                    </p>
+                                </li>
+                                <li><b>required:</b> true</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <b>use_randID</b>:
+                            <ul>
+                                <li><b>type:</b> boolean</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        If this field is set to true, an eight digit random ID will be used to help identify individual runs of a particular experiment setup.
+                                        The recommendation is to use this when you want to identify several parallel runs of the same experiment setup.
+                                    </p>
+                                </li>
+                                <li><b>required:</b> true</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <b>sep_after</b>:
+                            <ul>
+                                <li><b>type:</b> boolean</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        The value of this field is only relevant when at least one of the two preceeding fields is set to true. When relevant, if this field is set to true,
+                                        the value of the parameter(s) indicated by the previous two fields will become the name of a directory that houses the result files. If this field 
+                                        is set to false, then the value(s) will be joined to the <a href="terminology.html#base_file_name">base file name</a> using a 
+                                        <a href="terminology.html#basic_separator">basic separator</a> in order to form the full file name.
+                                    </p>
+                                </li>
+                                <li><b>required:</b> true</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
         </div>
     </body>
 </html>

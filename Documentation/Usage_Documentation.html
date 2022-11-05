@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <title>Multi-Armed Bandits System Usage</title>
+        <style>
+            ul {list-style: none;}
+        </style>
+    </head>
+    <body>
+        <h1>Multi-Armed Bandits System Usage</h1>
+        <div id="intro">
+            <p>
+                This file documents how to use the system for running multi-armed bandits experiments.<br>
+                <b>Note:</b> Everything stated in this documentation is correct with relation to the system 
+                and code at the time the documentation was written. The author makes no guarantee that 
+                future users making updates to the system will update the documentation to correspond with 
+                changes they have made.
+            </p>
+        </div>
+        <div id="table-of-contents">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li>
+                    <a href="#quick_guides">1 Getting Started</a>
+                    <ul>
+                        <li><a href="#experimenting">1.1 Running Experiments</a></li>
+                        <li><a href="#adding_application">1.2 Adding Applications</a></li>
+                        <li><a href="#adding_algorithm">1.3 Adding Algorithms</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#editing_code">2 Creating and Editing Code</a>
+                    <ul>
+                        <li><a href="#editing_existing_code">2.1 Editing Existing Code</a></li>
+                        <li><a href="#main_entry">2.2 Main Entry Points</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#files">3 Documentation</a>
+                    <ul>
+                        <li><a href="#general">3.1 General</a></li>
+                        <li><a href="#namespace">3.2 Namespace</a></li>
+                        <li><a href="#parameters">3.3 Parameters</a></li>
+                        <li><a href="#implementation">3.4 Implementation</a></li>
+                        <li><a href="#inputs">3.5 Inputs</a></li>
+                        <li><a href="#experiments">3.6 Experiments</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div id="contents">
+            <div id="quick_guides">
+                <h2>Getting Started</h2>
+                <div id="experimenting">
+                    <h3>Running Experiments</h3>
+                    <ol>
+                        <li>Create an input file (See <a href="Usage_Documentation/input_files.html">Input Files</a>)</li>
+                        <li>Run the experiments (See <a href="Usage_Documentation/run_experiment.html">Run Experiment Interface</a>)</li>
+                        <li>Compile and plot results</li>
+                    </ol>
+                </div>
+                <div id="adding_application">
+                    <h3>Adding a New Application</h3>
+                    <ol>
+                        <li>Create a parameter file. (See <a href="Usage_Documentation/parameter_files.html">Parameter Files</a>)</li>
+                        <li>Create an implementation. (See <a href="Usage_Documentation/application_implementation.html">Implementing Applications</a>)</li>
+                        <li>Configure the path setup. (See <a href="Usage_Documentation/namespace_files.html">Namespace Files</a>)</li>
+                        <li>(Optional, but recommended) Register the application in the namespace sub-system. 
+                            (See <a href="Usage_Documentation/alter_namespace.html#register">Registering an Application/Algorithm</a>)</li>
+                    </ol>
+                </div>
+                <div id="adding_algorithm">
+                    <h3>Adding a New Algorithm</h3>
+                    <ol>
+                        <li>Create a parameter file. (See <a href="Usage_Documentation/parameter_files.html">Parameter Files</a>)</li>
+                        <li>Create an implementation. (See <a href="Usage_Documentation/algorithm_implementation.html">Implementing Algorithms</a>)</li>
+                        <li>Configure the path setup. (See <a href="Usage_Documentation/namespace_files.html">Namespace Files</a>)</li>
+                        <li>(Optional, but recommended) Register the algorithm in the namespace sub-system.
+                            (See <a href="Usage_Documentation/alter_namespace.html#register">Registering an Application/Algorithm</a>)
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div id="editing_code">
+                <h2>Creating and Editing Code</h2>
+                <p>
+                    This section goes over the details of how to create different types of code files, some notes on important steps 
+                    in the process of editing existing code, and details about working with some key classes and files.<br>
+                    Before beginning, it is important to note that, for any code, import statements should be written relative to 
+                    the top level Code directory. So, for example, a file wishing to import the file Code/Utilities/program_vars.py as a module
+                    would write 'import Utilities.program_vars', regardless of where the importing file is located.
+                </p>
+                <div id="editing_existing_code">
+                    <h3>Editing Existing Code</h3>
+                    <p>
+                        If you intend to make changes to existing code that could, in any way, cause some other part of the code to 
+                        stop working, it is important that you first create and check out a new branch on Git to enact your changes on.
+                        Once you have finished writing and testing your changes, you can merge your branch back into the one you were previously
+                        working on and, if you wish, you can delete the branch you performed your changes on after merging.<br>
+                        Additionally, if extensive changes are being made to the codebase, such that users may wish to revisit the current version
+                        at some point in time, a named tag should be created on Git for the current version, so that the current version can easily be found
+                        and reloaded.
+                    </p>
+                </div>
+                <div id="main_entry">
+                    <h3>Main Entry Points</h3>
+                    <p>
+                        If you are writing a file that contains a 'main' entry point, it is vital that this file is called using the Code directory 
+                        as the working directory. It is recommended that the file be located within the main Code directory to facilitate this, 
+                        but it is not strictly necessary. 
+                    </p>
+                </div>                
+            </div>
+            <div id="files">
+                <h2>Documentation Pages</h2>
+                <ul>
+                    <li id="general">
+                        <h3>General</h3>
+                        <ul>
+                            <li><a href="Usage_Documentation/terminology.html">Terminology</a></li>
+                            <li><a href="Usage_Documentation/json.html">JSON Primer</a></li>
+                        </ul>
+                    </li>
+                    <li id="namespace">
+                        <h3>Namespace</h3>
+                        <ul>
+                            <li><a href="Usage_Documentation/namespace_design.html">Namespace System Design</a></li>
+                            <li><a href="Usage_Documentation/namespace_files.html">Namespace Files</a></li>
+                            <li><a href="Usage_Documentation/alter_namespace.html">Changing the Namespace Configuration</a></li>
+                        </ul>
+                    </li>
+                    <li id="parameters">
+                        <h3>Parameters</h3>
+                        <ul>
+                            <li><a href="Usage_Documentation/ParamSet.html">ParamSets</a></li>
+                            <li><a href="Usage_Documentation/parameter_files.html">Parameter Files</a></li>
+                            <li><a href="Usage_Documentation/globals.html">Global Variables</a></li>
+                        </ul>
+                    </li>
+                    <li id="implementation">
+                        <h3>Implementation</h3>
+                        <ul>
+                            <li><a href="Usage_Documentation/algorithm_implementation.html">Implementing an Algorithm</a></li>
+                            <li><a href="Usage_Documentation/application_implementation.html">Implementing an Application</a></li>
+                        </ul>
+                    </li>
+                    <li id="inputs">
+                        <h3>Inputs</h3>
+                        <ul>
+                            <li><a href="Usage_Documentation/input_files.html">Input Files</a></li>
+                            <li><a href="Usage_Documentation/input_generation_files.html">Input Generation Files</a></li>
+                            <li><a href="Usage_Documentation/generate_input.html">Generating an Input File</a></li>
+                        </ul>
+                    </li>
+                    <li id="experiments">
+                        <h3>Experiments</h3>
+                        <ul>
+                            <li><a href="Usage_Documentation/run_experiment.html">Experiment Interface</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

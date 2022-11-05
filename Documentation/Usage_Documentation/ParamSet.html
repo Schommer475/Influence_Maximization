@@ -1,0 +1,151 @@
+<html>
+    <head>
+        <title>ParamSet</title>
+    </head>
+    <body>
+        <h1>ParamSet</h1>
+        <p>
+            ParamSet is a class designed to handle the storage and retrieval of parameter values relevant 
+            to an experiment.
+        </p>
+        <h2>Construction</h2>
+        <p>
+            The constructor for a ParamSet expects three BaseParamSet objects, one for the global parameters,
+            one for the Application parameters, and one for the Algorithm parameters. The user of the system 
+            will almost never need to worry about this, because usually either the system will create the 
+            ParamSet for them, or they will create a ParamSet using the static <b>fromDict</b> method to
+            create a ParamSet from a dictionary representation, usually one that has been loaded from a file.
+        </p>
+        <h2>Static methods</h2>
+        <ul>
+            <li>
+                <h3 id="fromDict">fromDict</h3>
+                <h4>Parameters</h4>
+                <ol>
+                    <li>
+                        <b>data</b>: A dictionary representation of the paramset, usually created as a result of
+                        the <b>toDict</b> instance method
+                    </li>
+                </ol>
+                <h4>Effect</h4>
+                <p>
+                    Takes a dictionary representation of a ParamSet and returns a ParamSet instance initialized from
+                    that data.
+                </p>
+            </li>
+        </ul>
+        <h3>Instance methods</h3>
+        <ul>
+            <li>
+                <h3>get</h3>
+                <h4>Parameters</h4>
+                <ol>
+                    <li>
+                        <b>section</b>: An integer representing whether the parameter should be retrieved
+                        from among the application parameters, the algorithm parameters, or the 
+                        <a href="terminology.html#joint">joint</a> parameters. This integer should be one of
+                        applications_index, algorithms_index, and joint_index, imported from 
+                        Utilities/program_vars.py.
+                    </li>
+                    <li>
+                        <b>name</b>: The name of the parameter to retrieve.
+                    </li>
+                </ol>
+                <h4>Effect</h4>
+                <p>
+                    Retrieves the parameter of the specified name from the specified section. If the section is
+                    invalid or a parameter of the given name does not exist in the specified section, an error
+                    will be raised.
+                </p>
+            </li>
+            <li>
+                <h3>reset</h3>
+                <h4>Effect</h4>
+                <p>
+                    This class uses dynamically loaded instances of modules to look up any parameter values
+                    that were not specified by the user in the input file. However, Python is not able to
+                    pass module instances to sub-processes. This function temporarily clears out the module
+                    instances so that the ParamSet can be passed to a sub-process. The user should almost never 
+                    have to worry about this, as the system handles this automatically when running experiments.
+                </p>
+            </li>
+            <li>
+                <h3>setAttr</h3>
+                <h4>Parameters</h4>
+                <ol>
+                    <li>
+                        <b>section</b>: An integer representing whether the parameter to set
+                        should be among the application parameters, the algorithm parameters, or the 
+                        <a href="terminology.html#joint">joint</a> parameters. This integer should be one of
+                        applications_index, algorithms_index, and joint_index, imported from 
+                        Utilities/program_vars.py.
+                    </li>
+                    <li>
+                        <b>name</b>: The name of the parameter to set.
+                    </li>
+                    <li>
+                        <b>value</b>: The value to assign to the parameter.
+                    </li>
+                </ol>
+                <h4>Effect</h4>
+                <p>
+                    Assigns the value to a parameter of the given name from the specified section. If the section is
+                    invalid, an error will be raised.
+                </p>
+            </li>
+            <li>
+                <h3>getApp</h3>
+                <h4>Effect</h4>
+                <p>
+                    Returns the <a href="terminology.html#app_alg_name">name</a> of the application
+                    used in the experiment.
+                </p>
+            </li>
+            <li>
+                <h3>getAlg</h3>
+                <h4>Effect</h4>
+                <p>
+                    Returns the <a href="terminology.html#app_alg_name">name</a> of the algorithm
+                    used in the experiment.
+                </p>
+            </li>
+            <li>
+                <h3>getPath</h3>
+                <h4>Parameters</h4>
+                <ol>
+                    <li>
+                        <b>timestamp</b>: The experiment timestamp to possibly be used to identify the experiment
+                        in the file path. Usually passed in externally from the call to the run method.
+                    </li>
+                    <li>
+                        <b>randId</b>: The experiment random ID to possibly be used to identify the experiment
+                        in the file path. Usually passed in externally from the call to the run method, but 
+                        can be manually generated inside the experiment run to differentiate between files from
+                        the same experiment run.
+                    </li>
+                </ol>
+                <h4>Effect</h4>
+                <p>
+                    This function returns a string that represents an almost complete file path for output files
+                    generated by this experiment. Concatenating a <a href="terminology.html#base_file_name">
+                        base file name</a> to the end of the returned string will yield a complete file name,
+                    assuming that the experiment is being run with the expected working directory.<br>
+                    Assuming that the namespace system has been configured to use them for this Application/Algorithm
+                    combination, providing the same timestamp and/or random ID as those designated for the overall 
+                    experiment run will group the file with other files from the same run (including the output
+                    file), while changing them will differentiate them from other files from the same run
+                    that may have the same base file name.
+                </p>
+            </li>
+            <li>
+                <h3>toDict</h3>
+                <h4>Effect</h4>
+                <p>
+                    Returns a complete dictionary representation of the ParamSet. This representation can be
+                    stored in a file and then later passed into the static method <b>fromDict</b> to restore
+                    the ParamSet.
+                </p>
+            </li>
+        </ul>
+    </body>
+</html>

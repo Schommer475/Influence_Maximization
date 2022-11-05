@@ -4,6 +4,7 @@ Created on Sat Feb  5 15:19:04 2022
 
 @author: Tim Schommer
 """
+from operator import ge
 from Utilities.program_vars import default_unique_instance, default_unique_params
 from importlib import import_module
 import os
@@ -11,52 +12,7 @@ import json
 from parameters.parameterization_classes import ModuleHandler, ParamWrapper, \
     InstanceWrapper, ExperimentWrapper
 
-def validateRange(item, upper, name):
-    if type(item) is int:
-        if item < 0:
-            raise ValueError("An item in 'uses' had negative value: " 
-                             + str(item) +" (" + name + ")")
-        if item >= upper:
-            return None
-        return [item, item]
-    elif type(item) is str:
-        if len(item) == 0:
-            raise ValueError("Range strings in 'uses' for each item in " + name +" must be non-empty.")
-        _range = item.split("-")
-        if len(_range) > 2:
-            raise ValueError("Use ranges in inputs for each item in " + name +" must contain at most two values.")
-        elif len(_range) == 1:
-            item = int(_range[0])
-            if item < 0:
-                raise ValueError("An item range in 'uses' had negative value: " 
-                                 + str(item) +" (" + name + ")")
-            if item >= upper:
-                return None
-            return [item, item]
-        else:
-            start = int(_range[0])
-            end = int(_range[1])
-            if start < 0:
-                raise ValueError("An item range in 'uses' started with a negative value: " 
-                                 + str(start) +" (" + name + ")")
-            if end < 0:
-                raise ValueError("An item range in 'uses' ended with a negative value: " 
-                                 + str(end) +" (" + name + ")")
-                
-            if end >= upper:
-                end = upper - 1
-            
-            if start > end:
-                return None
-            
-            return [start, end]
-        
-    else:
-        raise ValueError("The type of items in 'uses' for each item in " 
-             + name 
-             +" is expected to be either an int or a string indicating a range.")
-
-def validateInputD(data, upperRange, name, useRanges=True):
+def validateSpecification(data, name, generateMode=False):
     if "name" not in data:
         raise ValueError(name + " in input file must all have a non-empty string field called 'name'")
     if not type(data["name"]) is str:
@@ -64,25 +20,14 @@ def validateInputD(data, upperRange, name, useRanges=True):
     if len(data["name"]) == 0:
         raise ValueError("The string field 'name' for each item in " + name +" must be non-empty.")
         
-    if useRanges:
-        if "uses" not in data:
-            raise ValueError(name + " in input file must all have a non-empty list field called 'uses'")
-        if not type(data["uses"]) is list:
-            raise ValueError("The field 'uses' for each item in " + name +" must be a non-empty list.")
-        if len(data["uses"]) == 0:
-            raise ValueError("The list field 'uses' for each item in " + name +" must be non-empty.")
-    else:
-        if "uses" in data:
-            raise ValueError("Generator files should not define the 'uses' field.")
-        
     if "unique" not in data:
         data["unique"] = default_unique_params
     if type(data["unique"]) is not bool:
         raise ValueError("The field 'unique' for each item in " + name +" must be a boolean.")
         
-    if "unique_instance" not in data and useRanges:
+    if "unique_instance" not in data and not generateMode:
         data["unique_instance"] = default_unique_instance or data["unique"]
-    if useRanges and type(data["unique_instance"]) is not bool:
+    if not generateMode and type(data["unique_instance"]) is not bool:
         raise ValueError("The field 'unique_instance' for each item in " + name +" must be a boolean.")
         
     if not "params" in data:
@@ -90,51 +35,32 @@ def validateInputD(data, upperRange, name, useRanges=True):
     if not type(data["params"]) is dict:
         raise ValueError("The field 'params' for each item in " + name +" is expected to be a dictionary of parameters.")
         
-    if not useRanges:
+    if generateMode:
         dat = data["params"]
         for key in dat:
             val = dat[key]
             if type(val) is not list:
                 raise ValueError("Every term within the params field for " + name +
                                  " in an input generation file must be a list of values to use.")
-        
-    if useRanges:
-        data["ranges"] = []
-        for r in data["uses"]:
-            ret = validateRange(r, upperRange, name)
-            if ret is not None:
-                data["ranges"].append(ret)
-    
 
-def validateCount(total, lst, name):
-    unfilled = {x for x in range(total)}
+def validateExperiment(experiment, maxApplication, maxAlgorithm):
+    if "application" not in experiment:
+        raise ValueError("Every experiment specification must have an integer field 'application'.")
+    if not type(experiment["application"]) is int:
+        raise ValueError("Every experiment specification must have an integer field 'application'.")
+    if experiment["application"] < 0 or experiment["application"] >= maxApplication:
+        raise ValueError("The value of the application field for experiment specifiers must be between 0 (inclusive) and the number of "
+            + "listed application specifications (exclusive).")
     
-    for item in lst:
-        for rng in item["ranges"]:
-            for i in range(rng[0],rng[1]+1):
-                if i in unfilled:
-                    unfilled.remove(i)
-                else:
-                    raise ValueError("Multiple " + name + " uses of index: " 
-                         + str(i))
-                    
-    if len(unfilled) > 0:
-        empty = []
-        for i in range(total):
-            if i in unfilled:
-                empty.append(i)
-        raise ValueError("Listings for " + name + 
-             " parameters must cover the full range from 0 to " 
-             + str(total - 1) + " Missing indices are: " + str(empty))
-        
-def validateInput(inputs, useRanges=True):
-    if not "num_experiments" in inputs and useRanges:
-        raise ValueError("Input file expected to have a field 'num_experiments' with a positive integer.")
-    if useRanges and not type(inputs["num_experiments"]) is int:
-        raise ValueError("The field 'num_experiments' is expected to be a positive integer.")
-    if useRanges and inputs["num_experiments"] < 1:
-        raise ValueError("'num_experiments' must be at least 1.")
-        
+    if "algorithm" not in experiment:
+        raise ValueError("Every experiment specification must have an integer field 'algorithm'.")
+    if not type(experiment["algorithm"]) is int:
+        raise ValueError("Every experiment specification must have an integer field 'algorithm'.")
+    if experiment["algorithm"] < 0 or experiment["algorithm"] >= maxAlgorithm:
+        raise ValueError("The value of the algorithm field for experiment specifiers must be between 0 (inclusive) and the number of "
+            + "listed algorithm specifications (exclusive).")
+
+def validateInput(inputs, generateMode=False):
     if not "global_vars" in inputs:
         inputs["global_vars"] = dict()
     if not type(inputs["global_vars"]) is dict:
@@ -164,17 +90,25 @@ def validateInput(inputs, useRanges=True):
     for o in inputs["algorithms"]:
         if not type(o) is dict:
             raise ValueError("Every item in 'algorithms' must be a JSON object (a Python dictionary).")
-            
-    for i in ["applications", "algorithms"]:
-        for o in inputs[i]:
-            if useRanges:
-                validateInputD(o, inputs["num_experiments"], i, useRanges)
-            else:
-                validateInputD(o, 0, i, useRanges)
-        if useRanges:
-            validateCount(inputs["num_experiments"], inputs[i], i)
-        
+
+    for type in ["applications", "algorithms"]:
+        for item in inputs[type]:
+            validateSpecification(item, type, generateMode)
+
+    if not generateMode:
+        if not "experiments" in inputs:
+            raise ValueError("Input file expected to have a field 'experiments' with a non-empty list of objects.")
+        if not type(inputs["experiments"]) is list:
+            raise ValueError("The field 'experiments' is expected to be a non-empty list of objects.")
+        if len(inputs["experiments"]) == 0:
+            raise ValueError("The list 'experiments' must be non-empty.")
+        for experiment in inputs["experiments"]:
+            if not type(experiment) is dict:
+                raise ValueError("Every item in 'experiments' must be a JSON object (a Python dictionary).")
+            validateExperiment(experiment, len(inputs["applications"], len(inputs["algorithms"])))
+
     return inputs
+            
 
 def getAndValidateInput(fileName):
     if not (os.path.exists(fileName) and os.path.isfile(fileName)):
@@ -264,22 +198,52 @@ def firstValidation(data, loadedParams):
             loadedParams[i][dat["name"]].validateSolo(dat)
             
 
-def createAndValidateParams(data,modules, backup, params):
+def createAndValidateParams(data, modules, backup, params):
     _globals = ParamWrapper("", data["unique_globals"], data["global_vars"], backup["globals"])
-    experiments = [ExperimentWrapper(_globals, params["globals"]) for _ in range(data["num_experiments"])]
-    for category in ["applications","algorithms"]:
-        for item in data[category]:
-            _par = ParamWrapper(item["name"], item["unique"], item["params"], 
-                backup[category][item["name"]])
-            instances = InstanceWrapper(item["unique"], item["unique_instance"], _par, 
-                modules[category[:-1]][item["name"]])
-            pmod = params[category][item["name"]]
-            for r in item["ranges"]:
-                for i in range(r[0], r[1]+1):
-                    if category == "applications":
-                        experiments[i].setApp(instances, pmod)
-                    else:
-                        experiments[i].setAlg(instances, pmod)
+    experiments = [ExperimentWrapper(_globals, params["globals"]) for _ in range(len(data["experiments"]))]
+    applications = [
+        {
+            instanceWrapper: InstanceWrapper(
+                application["unique"],
+                application["unique_instance"],
+                ParamWrapper(
+                    application["name"],
+                    application["unique"],
+                    application["params"],
+                    backup["applications"][application["name"]]
+                ),
+                modules["application"][application["name"]]
+            ),
+            paramModule: params["applications"][application["name"]]
+        }
+
+        for application in data["applications"]
+    ]
+
+    algorithms = [
+        {
+            instanceWrapper: InstanceWrapper(
+                algorithm["unique"],
+                algorithm["unique_instance"],
+                ParamWrapper(
+                    algorithm["name"],
+                    algorithm["unique"],
+                    algorithm["params"],
+                    backup["algorithms"][algorithm["name"]]
+                ),
+                modules["algorithm"][algorithm["name"]]
+            ),
+            paramModule: params["algorithms"][algorithm["name"]]
+        }
+        
+        for algorithm in data["algorithms"]
+    ]
+
+    for index, experiment in data["experiments"]:
+        appData = applications[experiment.application]
+        algData = algorithms[experiment.algorithm]
+        experiments[index].setApp(appData.instanceWrapper, appData.paramModule)
+        experiments[index].setAlg(algData.instanceWrapper, algData.paramModule)
                         
                         
     gs = _globals.get()

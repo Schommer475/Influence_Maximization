@@ -1,6 +1,6 @@
 <html>
     <head>
-
+        <title>Terminology</title>
         <style>
             li {
                 margin: 1rem;
@@ -24,6 +24,18 @@
                     be the name of the class, but it does not have to be. For example, the Influence Maximization 
                     application is implemented using a class named Im, however, the actual application name is im 
                     (names are case-sensitive).
+                </li>
+                <li id="app_alg_identifier">
+                    <b>application/algorithm identifier</b>: This term is used within the 
+                    <a href="#namespace">namespace</a> system to refer to a subsection within the 
+                    path parameters for applications and algorithms. This sub-section is required 
+                    in all application and algorithm path sections and must appear first among its 
+                    related sub-sections. It begins by identifying whether the section is an 
+                    application section or an algorithm section using <b>app-</b> or <b>alg-</b>
+                    respectively, followed by identifying which application or algorithm the 
+                    section falls under by concatenating the appplication or algorithm 
+                    <a href="#app_alg_name">name</a> to the previous string.<br>
+                    <b>Example:</b> app-cmab
                 </li>
                 <li id="base_file_name">
                     <b>base file name</b>: This refers to the name that a file would have if you were to strip the 

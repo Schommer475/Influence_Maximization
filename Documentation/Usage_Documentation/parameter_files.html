@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <title>Parameter Files</title>
+    </head>
+    <body>
+        <h1>
+            Parameter Files
+        </h1>
+        <div id="table-of-contents">
+            <h2>Table of Contents</h2>
+            <ol>
+                <li><a href="#purposes">Parameter File Uses</a></li>
+                <li><a href="#creating">Creating a Parameter File</a></li>
+            </ol>
+        </div>
+        <div id="purposes">
+            <h3>Parameter File Uses</h3>
+            <ol>
+                <li>
+                    Storing the list of parameters used by the application or algorithm, as well as
+                    those used only by the <a href="terminology.html#namespace">namespace system</a>, and 
+                    providing default values for them.<br>
+                    <br>
+                    These are specified by providing a variable name and assigning the desired value to
+                    it on the global scope of the parameter file.
+                </li>
+                <li>
+                    Computing the values of additional parameters which are based on the values of other
+                    parameters.<br>
+                    <br>
+                    This can be done within the function <b>validateSolo</b> which every parameter file 
+                    is required to implement.<br>
+                    Or, if the caluclation requires values from both the Application and the Algorithm,
+                    it can be done within the optional function <b>validateFull</b>.
+                </li>
+                <li>
+                    Validating parameter values provided at runtime to make sure they are the right type
+                    and the values make sense for what they will be used for. This is not only validating
+                    individual parameter values but also validating any combinations of parameters that 
+                    are constrained.<br>
+                    <br>
+                    This can be done within the function <b>validateSolo</b> which every parameter file 
+                    is required to implement.
+                </li>
+                <li>
+                    Optionally, validating the Application, Algorithm, and global parameters to ensure 
+                    that they are valid together.<br>
+                    <br>
+                    This is done by implementing a function called <b>validateFull</b> which accepts,
+                    as arguments, the ParamSet object for the experiment, the Application instance, 
+                    and the Algorithm instance. The parameter file will also need to define a boolean
+                    variable <b>doFullCheck</b> with a value of <b>True</b>.
+                </li>
+            </ol>
+        </div>
+        <div id="creating">
+            <h3>Creating a Parameter File</h3>
+            <p>
+                Parameter files should, ideally, be created alongside the implementation of the Application
+                or Algorithm they are being created for. Creating a parameter file involves the following
+                steps:
+            </p>
+            <ol>
+                <li>
+                    <b>Create the file</b>: The file should be named <b>&ltname&gt_params.py</b>, where
+                    <b>&ltname&gt</b> is the <a href="terminology.html#/app_alg_name">name</a> of the
+                    application or algorithm that the parameter file is for.<br>
+                    If the parameter file is being created for an application, it should be placed in
+                    the directory <b>Code/parameters/application_params</b>.<br>
+                    If the parameter file is being created for an algorithm, it should be placed in
+                    the directory <b>Code/parameters/algorithm_params</b>.<br>
+                    <br>
+                    The file for global parameters is <b>global_parameters.py</b> and is located in
+                    <b>Code/parameters</b>.
+                </li>
+                <li>
+                    <b>Add parameters and utility functions</b>: Any parameters that are used in the
+                    application or algorithm the file belongs to should be declared here and provided
+                    a default value that it will take on if the user does not provide one.<br>
+                    If a parameter value is likely to be changed by the user and the value does not have
+                    a string form that is human readable and able to be used in a file path, then a 
+                    variable containing a useable string representation should also be provided.<br>
+                    This is also the place to write any utility function that may be needed, whether 
+                    that be for assisting with validation, calculating a default value (such as with the
+                    number of multiprocessing cores to be used, found in the global variables), calculating
+                    the value of regular parameters or name parameters based on what is passed in by the user,
+                    or other purposes.
+                </li>
+                <li>
+                    <b>Add the validateSolo function</b>: This function is used to validate parameter values
+                    provided at runtime.<br> It should accept a single argument, which is a representation of
+                    the application or algorithm received from the input file. The user specified parameters
+                    will be in a field called <b>params</b> within the argument.<br>
+                    <br>
+                    This function should validate the data type and value of any parameters provided. It should
+                    also calculate the value of any parameters whose value is derived from the value of other
+                    parameters and store them in the <b>params</b> field of the passed in object. This includes
+                    those that are used for a file path string representation of parameter values.<br>
+                    Additionally, the function should make sure that any parameters whose allowed values are
+                    dependent on the values of other parameters have values that all work together.<br>
+                    <br>
+                    If any issue is discovered with the validity of the input, an error should be raised with a
+                    clear error message indicating the cause of the error.
+                </li>
+                <li>
+                    <b>(optional) Add the validateFull function</b>: (Note: in order for this function to be run, 
+                    you must declare a variable of <b>doFullCheck</b> and assign it the value <b>True</b>) This
+                    function is used to validate the Application instance together with the Algorithm instance
+                    and the set of global parameters. It should accept three arguments: the ParamSet object
+                    for the experiment (See <a>ParamSets</a> for more details), the Application instance, and
+                    the Algorithm instance. <br>
+                    <br>
+                    This function should check for any possible issues with the parameters being used together or
+                    issues with what Application and Algorithm are being used together. If it finds any issues, it
+                    should raise an error with a clear error message.<br>
+                    <br>
+                    This function can also be used as an opportunity to calculate any experiment parameters that
+                    are derived using parameters from both the Application and the Algorithm. Any parameters derived
+                    in this manner should be set into the ParamSet using the <b>joint_index</b>, found as a variable
+                    in <b>Code/Utilities/program_vars.py</b>.
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

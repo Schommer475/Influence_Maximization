@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <title>Implementing Applications</title>
+    </head>
+    <body>
+        <div id="creating">
+            <h1>Implementing an Application</h1>
+            <p>
+                Applications should, ideally, be implemented alongside the creation of the corrsponding
+                parameter file. Implementing an Application involves the following
+                steps:
+            </p>
+            <ol>
+                <li>
+                    <b>Create the file</b>: The file should be named <b>&ltname&gt.py</b>, where
+                    <b>&ltname&gt</b> is the <a href="terminology.html#/app_alg_name">name</a> of the
+                    application.<br>
+                    The file can be placed anywhere under
+                    the directory <b>Code/application</b>.<br>
+                    <br>
+                </li>
+                <li>
+                    <b>Implement the Application class</b>: You should import Application from application.application
+                    and create a class that extends it. Your class should implement the following instance methods:
+                    <ol>
+                        <li>
+                            <b>__init__</b>: The constructor. Accepts a <b>BaseParamSet</b> (essentially the same as
+                            <a href="ParamSet.html">ParamSet</a>, but you don't specify what section parameters 
+                            should go in/come from) and uses it to initialize the Application.
+                        </li>
+                        <li>
+                            <b>getReward</b>: Receives a list <b>choices</b> of options that the algorithm is
+                            choosing to try as well as an (optional, there for backwards compatibility with 
+                            influence maximization) set of chances that each option will be spontaneously influenced.
+                            The list of choices should expect the options to be identified in the same way in which
+                            they are identified within the <b>listOptions</b> function.<br>
+                            <br>
+                            This function should return the reward received from choosing that set of options.
+                        </li>
+                        <li>
+                            <b>getOptionCount</b>: This function returns the number of options available for an
+                            Algorithm to choose from.
+                        </li>
+                        <li>
+                            <b>listOptions</b>: This function returns a list of options available to an algorithm,
+                            with the identifiers that correspond to them within the system.<br>
+                            For instance, if I have a set of of 13 options, identified with numbers starting from
+                            1, but the option that was identified by 6 has been left out of the available options
+                            for some reason, then this method will return: [1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13,
+                            14].
+                        </li>
+                        <li>
+                            <b>refresh</b>: This method should do two things:
+                            <ol>
+                                <li>
+                                    It should re-initialize any variables that were initialized using randomness.
+                                </li>
+                                <li>
+                                    It should reset any internal state that it may keep throughout an experiment
+                                    run back to the starting state.
+                                </li>
+                            </ol>
+                            If neither are relevant, than it can simply be implemented and do nothing.
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <b>Write a 'createInstance' function</b>: This function exists to act as a universal way to
+                    create an instance of the Application, it accepts a <b>BaseParamSet</b> object and passes it
+                    to the class's constructor, returning the class instance.
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

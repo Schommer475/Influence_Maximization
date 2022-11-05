@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <title>Implementing Algorithms</title>
+    </head>
+    <body>
+        <div id="creating">
+            <h1>Implementing an Algorithm</h1>
+            <p>
+                Algorithms should, ideally, be implemented alongside the creation of the corrsponding
+                parameter file. Implementing an Algorithm involves the following
+                steps:
+            </p>
+            <ol>
+                <li>
+                    <b>Create the file</b>: The file should be named <b>&ltname&gt.py</b>, where
+                    <b>&ltname&gt</b> is the <a href="terminology.html#/app_alg_name">name</a> of the
+                    algorithm.<br>
+                    The file can be placed anywhere under
+                    the directory <b>Code/algorithm</b>.<br>
+                    <br>
+                </li>
+                <li>
+                    <b>Implement the Algorithm class</b>: You should import Algorithm from algorithm.algorithm
+                    and create a class that extends it. Your class should implement the following instance methods:
+                    <ol>
+                        <li>
+                            <b>__init__</b>: The constructor. Accepts a <b>BaseParamSet</b> (essentially the same as
+                            <a href="ParamSet.html">ParamSet</a>, but you don't specify what section parameters 
+                            should go in/come from) and uses it to initialize the Algorithm.
+                        </li>
+                        <li>
+                            <b>run</b>: 
+                            <h4>Parameters</h4>
+                            <ol>
+                                <li>
+                                    <b>app</b>: The Application instance on which to run the experiment.
+                                </li>
+                                <li>
+                                    <b>pset</b>: The <a href="ParamSet.html">ParamSet</a> object for the experiment.
+                                    Used to look up and (potentially) store parameter values.
+                                </li>
+                                <li>
+                                    <b>timestamp</b>: The timestamp associated with the experiment run. To be passed
+                                    into the ParamSet's <b>getPath</b> function when saving any additional output
+                                    files over the course of the experiment.
+                                </li>
+                                <li>
+                                    <b>randId</b>: The random ID associated with the experiment run. Can be passed
+                                    into the ParamSet's <b>getPath</b> function when saving any additional output
+                                    files over the course of the experiment.
+                                </li>
+                            </ol>
+                            <h4>Effect</h4>
+                            <p>
+                                Runs the Algorithm on the given Application using the given parameters.
+                                Should return an object containing values that it wants saved to file.<br>
+                                <br>
+                                At the time of writing, all algorithms output an object with two fields:
+                                <b>best_seed_sets</b> and <b>rewards</b>.
+                            </p>
+                        </li>
+                        <li>
+                            <b>refresh</b>: This method should do two things:
+                            <ol>
+                                <li>
+                                    It should re-initialize any variables that were initialized using randomness.
+                                </li>
+                                <li>
+                                    It should reset any internal state that it may keep throughout an experiment
+                                    run back to the starting state.
+                                </li>
+                            </ol>
+                            If neither are relevant, than it can simply be implemented and do nothing.
+                        </li>
+                    </ol>
+                </li>
+                <li>
+                    <b>Write a 'createInstance' function</b>: This function exists to act as a universal way to
+                    create an instance of the Algorithm, it accepts a <b>BaseParamSet</b> object and passes it
+                    to the class's constructor, returning the class instance.
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

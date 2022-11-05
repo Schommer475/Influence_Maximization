@@ -1,0 +1,354 @@
+<html>
+    <head>
+        <title>Files for Generating Input Files</title>
+        <style>
+            ul {list-style: none;}
+        </style>
+    </head>
+    <body>
+        <h1>Files for Geneating Input Files</h1>
+        <p>
+            Input files are used to determine the configuration and set of experiments to run when calling out to the system to run experiments.
+            However, sometimes users want to specify a list of values that a particular parameter can take on and then run tests where all possible combinations of 
+            parameters are tried. The purpose of these files is to allow users to specify Application and Algorithm specifications where each parameter specified
+            is a list of values that the would like to use in combination with other sets of parameters in the specification. For each specification, 
+            all possible combinations of parameter values are calculated. From those expanded lists of specifications, all possible combinations of Application 
+            and Algorithm specifications are taken, tested for validity, and those that are valid are made into an input file that can be passed to the system to be run.<br>
+            <br>
+            In order to reduce the amount of writing needed, both the globals and each 
+            application and algorithm have a set of default values for all parameters 
+            coded in a parameter file. Users only need to specify the sets of possible parameter values for parameters 
+            where they would like to test more than one possible value or the value they would like to test differs from the default.<br>
+            <strong>Note:</strong> The combination effect is not applicable to globals.<br>
+            <br>
+            Files to generate input files are written as JSON files. (See 
+            <a href="json.html">here</a> for a reference
+            on JSON files.)
+        </p>
+        <div id="#fields">
+            <b>fields:</b>
+            <ul>
+                <li>
+                    <b>global_vars</b>:
+                    <ul>
+                        <li><b>type:</b> object</li>
+                        <li>
+                            <b>description:</b>
+                            <p>
+                                This is used to specify the value of any global parameters that should not match the default values.<br>
+                                An explanation of the global parameters and their default values can be found <a href="globals.html">here</a>.
+                            </p>
+                        </li>
+                        <li><b>required:</b> false</li>
+                        <li><b>default:</b> Empty dictionary. Causes the default value for each global parameter, as specified in the global parameter file, to be used.</li>
+                    </ul>
+                </li>
+                <li>
+                    <b>unique_globals</b>:
+                    <ul>
+                        <li><b>type:</b> boolean</li>
+                        <li>
+                            <b>description:</b>
+                            <p>
+                                In addition to the system running the experiments, each experiment configuration in the generated list will receive the global 
+                                parameters, in case an experiment needs access to them for some reason. If this variable is set to true, every experiment 
+                                configuration will receive a unique copy of the object specifying the globals, if it is false, every experiment configuration 
+                                will receive the same object reference.
+                            </p>
+                        </li>
+                        <li><b>required:</b> false</li>
+                        <li><b>default:</b> false</li>
+                    </ul>
+                </li>
+                <li>
+                    <b>applications</b>:
+                    <ul>
+                        <li><b>type:</b> list</li>
+                        <li>
+                            <b>description:</b>
+                            <p>
+                                This is a list of application specifications (application 
+                                and parameters to be used) to be used in the experiments.
+                            </p>
+                        </li>
+                        <li><b>required:</b> true</li>
+                        <li><b>minLength:</b> 1</li>
+                        <li>
+                            <b>items:</b>
+                            <ul>
+                                <li><b>type:</b> object</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        The specification for an application setup to be used by one or
+                                        more experiments.
+                                    </p>
+                                </li>
+                                <li>
+                                    <b>fields:</b>
+                                    <ul>
+                                        <li>
+                                            <b>name</b>:
+                                            <ul>
+                                                <li><b>type:</b> string</li>
+                                                <li>
+                                                    <b>description:</b>
+                                                    <p>The 
+                                                        <a href="terminology.html#app_alg_name">name</a> of the 
+                                                        application.
+                                                    </p>
+                                                </li>
+                                                <li><b>required:</b> true</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <b>unique</b>:
+                                            <ul>
+                                                <li><b>type:</b> boolean</li>
+                                                <li>
+                                                    <b>description:</b>
+                                                    <p>
+                                                        An individual application specification can 
+                                                        be paired with more than one algorithm specification
+                                                        in the experiments to be run. This parameter dictates 
+                                                        whether each experiment setup that the application 
+                                                        specification is used in receives its own unique copy
+                                                        of the parameters being passed in, in order
+                                                        to guard against other instances making changes, or if 
+                                                        it will use the same object of parameters to save memory
+                                                        usage.<br>
+                                                        <br>
+                                                        If true, each experiment setup will receive its own unique 
+                                                        copy of the parameters. Note that this is not the same thing
+                                                        as each <it>run</it> of an experiment setup receiving its own 
+                                                        unique copy of the parameters.
+                                                    </p>
+                                                </li>
+                                                <li><b>required:</b> false</li>
+                                                <li>
+                                                    <b>default:</b>
+                                                    The default value used is whatever value is specified for the variable 
+                                                    <b>default_unique_params</b> found in the file <b>Code/Utilities/program_vars.py</b>.
+                                                    <br><br>
+                                                    At the time of writing, that value is false.
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <b>params</b>:
+                                            <ul>
+                                                <li><b>type:</b> object</li>
+                                                <li>
+                                                    <b>description:</b>
+                                                    <p>
+                                                        Object specifying the parameters for which values other than the default are to be tested.
+                                                        Corresponding to each provided parameter must be a list of values for that parameter to take
+                                                        on. The sets of values from each list will be exaustively combined to form a list of application
+                                                        specifications for each individual applications, those lists of application specifications will 
+                                                        be combined into a single list of application specifications which will then be exhaustively
+                                                        combined with the generated list of algorithm specifications to form a complete list of 
+                                                        experiments.
+                                                    </p>
+                                                </li>
+                                                <li><b>required:</b> false</li>
+                                                <li>
+                                                    <b>default:</b>
+                                                    The default value is an empty object, meaning that every 
+                                                    parameter will take on the default value specified in the 
+                                                    parameter file.
+                                                </li>
+                                                <li>
+                                                    <b>fields:</b>
+                                                    <ul>
+                                                        <li>
+                                                            <b>r'.+'</b>:
+                                                            <ul>
+                                                                <li>
+                                                                    <b>description:</b> 
+                                                                    <p>
+                                                                        This is a pattern property. The name is not literal (or even the correct regular expression, 
+                                                                        because no one regular expression could match every valid Python identifier), it is meant to match the name of any parameter 
+                                                                        written in the application's parameter file. The value is a list containing whatever values the user wishes that 
+                                                                        parameter value to be tested with, provided they will pass the validation in the parameter file.<br>
+                                                                        There can be more than one of these.
+                                                                    </p>
+                                                                </li>
+                                                                <li><b>type:</b> list</li>
+                                                                <li><b>minLength:</b> 1</li>
+                                                                <li><b>required:</b> False</li>
+                                                                <li>
+                                                                    <b>default:</b> List with only the parameter's default value in it. Meaning that the parameter will take on its default 
+                                                                    value as specified in the parameter file.
+                                                                </li>
+                                                                <li>
+                                                                    <b>items:</b>
+                                                                    <ul>
+                                                                        <li><b>type:</b> Any</li>
+                                                                        <li>
+                                                                            <b>description:</b>
+                                                                            <p>
+                                                                                The value is whatever the user wishes that parameter value to be, provided it will pass the validation in the parameter file.
+                                                                            </p>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <b>algorithms</b>:
+                    <ul>
+                        <li><b>type:</b> list</li>
+                        <li>
+                            <b>description:</b>
+                            <p>
+                                This is a list of algorithm specifications (algorithm 
+                                and parameters to be used) to be used in the experiments.
+                            </p>
+                        </li>
+                        <li><b>required:</b> true</li>
+                        <li><b>minLength:</b> 1</li>
+                        <li>
+                            <b>items:</b>
+                            <ul>
+                                <li><b>type:</b> object</li>
+                                <li>
+                                    <b>description:</b>
+                                    <p>
+                                        The specification for an algorithm setup to be used by one or
+                                        more experiments.
+                                    </p>
+                                </li>
+                                <li>
+                                    <b>fields:</b>
+                                    <ul>
+                                        <li>
+                                            <b>name</b>:
+                                            <ul>
+                                                <li><b>type:</b> string</li>
+                                                <li>
+                                                    <b>description:</b>
+                                                    <p>The 
+                                                        <a href="terminology.html#app_alg_name">name</a> of the 
+                                                        algorithm.
+                                                    </p>
+                                                </li>
+                                                <li><b>required:</b> true</li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <b>unique</b>:
+                                            <ul>
+                                                <li><b>type:</b> boolean</li>
+                                                <li>
+                                                    <b>description:</b>
+                                                    <p>
+                                                        An individual application specification can 
+                                                        be paired with more than one algorithm specification
+                                                        in the experiments to be run. This parameter dictates 
+                                                        whether each experiment setup that the algorithm 
+                                                        specification is used in receives its own unique copy
+                                                        of the parameters being passed in, in order
+                                                        to guard against other instances making changes, or if 
+                                                        it will use the same object of parameters to save memory
+                                                        usage.<br>
+                                                        <br>
+                                                        If true, each experiment setup will receive its own unique 
+                                                        copy of the parameters. Note that this is not the same thing
+                                                        as each <it>run</it> of an experiment setup receiving its own 
+                                                        unique copy of the parameters.
+                                                    </p>
+                                                </li>
+                                                <li><b>required:</b> false</li>
+                                                <li>
+                                                    <b>default:</b>
+                                                    The default value used is whatever value is specified for the variable 
+                                                    <b>default_unique_params</b> found in the file <b>Code/Utilities/program_vars.py</b>.
+                                                    <br><br>
+                                                    At the time of writing, that value is false.
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <b>params</b>:
+                                            <ul>
+                                                <li><b>type:</b> object</li>
+                                                <li>
+                                                    <b>description:</b>
+                                                    <p>
+                                                        Object specifying the parameters for which values other than the default are to be tested.
+                                                        Corresponding to each provided parameter must be a list of values for that parameter to take
+                                                        on. The sets of values from each list will be exaustively combined to form a list of algorithm
+                                                        specifications for each individual algorithm, those lists of algorithm specifications will 
+                                                        be combined into a single list of algorithm specifications which will then be exhaustively
+                                                        combined with the generated list of application specifications to form a complete list of 
+                                                        experiments.
+                                                    </p>
+                                                </li>
+                                                <li><b>required:</b> false</li>
+                                                <li>
+                                                    <b>default:</b>
+                                                    The default value is an empty object, meaning that every 
+                                                    parameter will take on the default value specified in the 
+                                                    parameter file.
+                                                </li>
+                                                <li>
+                                                    <b>fields:</b>
+                                                    <ul>
+                                                        <li>
+                                                            <b>r'.+'</b>:
+                                                            <ul>
+                                                                <li>
+                                                                    <b>description:</b> 
+                                                                    <p>
+                                                                        This is a pattern property. The name is not literal (or even the correct regular expression, 
+                                                                        because no one regular expression could match every valid Python identifier), it is meant to match the name of any parameter 
+                                                                        written in the algorithm's parameter file. The value is a list containing whatever values the user wishes that 
+                                                                        parameter value to be tested with, provided they will pass the validation in the parameter file.<br>
+                                                                        There can be more than one of these.
+                                                                    </p>
+                                                                </li>
+                                                                <li><b>type:</b> list</li>
+                                                                <li><b>minLength:</b> 1</li>
+                                                                <li><b>required:</b> False</li>
+                                                                <li>
+                                                                    <b>default:</b> List with only the parameter's default value in it. Meaning that the parameter will take on its default 
+                                                                    value as specified in the parameter file.
+                                                                </li>
+                                                                <li>
+                                                                    <b>items:</b>
+                                                                    <ul>
+                                                                        <li><b>type:</b> Any</li>
+                                                                        <li>
+                                                                            <b>description:</b>
+                                                                            <p>
+                                                                                The value is whatever the user wishes that parameter value to be, provided it will pass the validation in the parameter file.
+                                                                            </p>
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>

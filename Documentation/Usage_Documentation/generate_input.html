@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <title>Generate Input Interface</title>
+    </head>
+    <body>
+        <div>
+            <h1>generate_input.py</h1>
+            <p>
+                generate_input.py is a Python file used to generate input files where the parameters, applications, and algorithms used in the experiments are to be tested in every
+                possible combination. Note that this file expects to be run with the Code directory as the current working directory.
+            </p>
+            <div>
+                This function expects two arguments, which must appear first, in the order that they are listed, and two optional flags that, when used, appear after the 
+                arguments in any order.
+                <h2>Arguments</h2>
+                <ol>
+                    <li>
+                        <b>input file</b>:
+                        <p>
+                            This is the path, relative to the current working directory, to the <a href="input_generation_files.html">input generation file</a> that should be used 
+                            to generate the input file.
+                        </p>
+                    </li>
+                    <li>
+                        <b>output file name</b>:
+                        <p>
+                            This is the name (the path is always one of two predetermined options) of the generated input file.
+                        </p>
+                    </li>
+                </ol>
+                <h2>Flags</h2>
+                <ol>
+                    <li>
+                        <b>-c</b>:
+                        <p>
+                            This flag specifies that the generated input file should be placed in the directory of commonly used input files (which is tracked by version control).
+                            If this option is not supplied, the generated input file will be placed in the directory of temporary input files, which is not tracked by version control.
+                            The file can be moved manually later if necessary.<br>
+                            <br>
+                            The path for the directory of commonly used input files is specified in Code/Utilities/global_names.py by the variable common_inputs. At the time of writing
+                            this is 'Files/Inputs/common'.<br>
+                            The path for the directory of temporary input files is specified in Code/Utilities/global_names.py by the variable temp_inputs. At the time of writing
+                            this is 'Files/Inputs/temp'.
+                        </p>
+                    </li>
+                    <li>
+                        <b>-r</b>:
+                        <p>
+                            This flag specifies that the generated output file should be more human readable at the cost of storage space. When used, the json files will be generated
+                            with an indentation level of 6.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </body>
+</html>

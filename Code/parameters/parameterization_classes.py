@@ -204,7 +204,7 @@ class ParamSet:
         self.applicationParams.reset()
         self.algorithmParams.reset()
     
-    def setAttr(self, section: int,name: str, value):
+    def setAttr(self, section: int, name: str, value):
         if section == globals_index:
             self.globalParams.setAttr(name,value)
         elif section == applications_index:
@@ -231,10 +231,14 @@ class ParamSet:
         return {
             "globalParams":self.globalParams.toDict(),
             "applicationParams":self.applicationParams.toDict(),
-            "algorithmParams":self.algorithmParams.toDict()
+            "algorithmParams":self.algorithmParams.toDict(),
+            "jointParams": self.jointParams
             }
     
     def fromDict(data):
-        return ParamSet(BaseParamSet.fromDict(data["globalParams"]), 
+        pset = ParamSet(BaseParamSet.fromDict(data["globalParams"]), 
                         BaseParamSet.fromDict(data["applicationParams"]), 
                         BaseParamSet.fromDict(data["algorithmParams"]))
+        pset.jointParams = data["jointParams"]
+
+        return pset
