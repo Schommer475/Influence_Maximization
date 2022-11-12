@@ -26,19 +26,125 @@
         <div id="contents">
             <h2>Parameter Access</h2>
             <p>
-
+                Classes relating to accessing parameters are located in 
+                <b>Code/parameters/parameterization_classes.py</b>. <br>
+                <br>
+                The class <b>ModuleHandler</b> stores information needed to dynamically load a 
+                module storing default parameter values. It also has a methods for wiping the
+                loaded module to let it be passed to a sub-process, and for transforming to and
+                from a dictionary, letting it be stored and read to/from a file.<br>
+                <br>
+                The class <b>BaseParamSet</b> contains a <b>ModuleHandler</b> and a dictionary
+                of overwritten parameter values for a single set of globals, application parameters, or
+                algorithm parameters. It has methods for getting the name of the application/algorithm,
+                getting or setting a parameter value, resetting the <b>ModuleHandler</b>, and 
+                converting to and from a dictionary.<br>
+                <br>
+                The class <b>ParamSet</b> handles the parameters for an individual experiment.
+                It has <b>BaseParamSets</b> for application parameters, algorithm parameters, and
+                global parameters, as well as methods to get and set parameters from particular
+                sections, get the names of the application and algorithm, reset the <b>BaseParamSets</b>,
+                convert to and from a dictionary, and get the path at which to save a file by calling
+                the namespace system.
             </p>
             <h2>Obtaining Instances of Applications/Algorithms and Experiments</h2>
             <p>
-
+                The classes governing obtaining instances of ParamSets, Applications, and Algorithms
+                and whether those instances should be unique or a shared copy are located in 
+                <b>Code/parameters/parameterization_classes.py</b>. <br>
+                <br>
+                The class <b>ParamWrapper</b> wraps around a set of parameters and a <b>ModuleHandler</b>
+                and returns <b>BaseParamSets</b>.<br>
+                <br>
+                The class <b>InstanceWrapper</b> takes in a <b>ParamWrapper</b> and a <b>ModuleHandler</b>
+                and returns instances of the Application/Algorithm.<br>
+                <br>
+                The class <b>ExperimentWrapper</b> takes a <b>ParamWapper</b> for the global parameters
+                and an <b>InstanceWrapper</b> for the Application and the Algorithm and returns copies
+                of the experiment. It also has a method to validate that all three are compatible together.
             </p>
             <h2>Obtaining File Paths to Save at</h2>
             <p>
-                
+                The functions used to determine the path to use for saving an experiment result file
+                are located in <b>Code/namespace/namespace.py</b>.<br>
+                <br>
+                <b>getAppFirst()</b> returns whether application parameters or algorithm parametes appear
+                first in the path.<br>
+                <br>
+                <b>getInput()</b> takes whether an application or algorithm is being looked for and
+                its name and returns the configuration of the path parts for that application/algorithm
+                based on either a stored configuration file or default values.<br>
+                <br>
+                <b>getAndValidateInput()</b> calls <b>getInput()</b> and then validates what it gets 
+                back to ensure that it matches the expected format for data from an application/algorithm
+                path configuration file. Then it returns the result of <b>getInput()</b>.<br>
+                <br>
+                <b>getJoint()</b> takes the name of the application and algorithm being looked for and
+                returns the path configuration for files that use both based on either a stored
+                configuration file or default values.<br>
+                <br>
+                <b>getAndValidateJoint()</b> calls <b>getJoint()</b> and then validates what it gets 
+                back to ensure that it matches the expected format for data from a joint
+                path configuration file. Then it returns the result of <b>getJoint()</b>.<br>
+                <br>
+                <b>buildBaseSection()</b> takes whether an application or algorithm path section being
+                built, the results of <b>getAndValidateInput()</b>, and a <b>ParamSet</b> and returns 
+                a path section and what type of separator that section should be followed by if it is
+                the first section.<br>
+                <br>
+                <b>buildJointSection()</b> takes the result of <b>getAndValidateJoint()</b>, a timestamp,
+                and a randomId and returns the path section, if any, for the joint part of the experiment.<br>
+                <br>
+                <b>orderInfo()</b> takes the information for path sections for the application, algorithm,
+                and joint parts and puts them into the order in which they should appear in the completed
+                file path.<br>
+                <br>
+                <b>getFilePath()</b> puts it all together, taking a <b>ParamSet</b>, a timestamp, and a
+                randomId and returns a complete base file path at which to save the file.
             </p>
             <h2>Modifying the Namespace</h2>
+            <h3>Modifying the Namespace Configuration Files</h3>
+            <p>
+                The functions handling performing changes on namespace configuration files are found in
+                <b>Code/namespace/namespace_internal.py</b>.<br>
+                <br>
+                <b>invert_Namespace()</b> changes the order in which the application and algorithm
+                parameters should appear.
+                <b>toggleTimestamp_Namespace()</b> changes whether or not a timestamp is used in
+                a joint section.
+                <b>toggleRandID_Namespace()</b> changes whether or not a random ID is used in
+                a joint section.
+                <b>toggleTimeRandBreak_Namespace()</b> changes whether the timestamp and random ID
+                are should be followed by a path separator or joined directly to the base file name
+                with a basic separator.
+                <b>toggleBreak_Namespace()</b> changes whether a given parameter should be followed
+                by a path separator or joined to the rest of the file path with a basic separator.
+                <b>swap_Namespace()</b> swaps the expected position of two parameters, as well
+                as their accompanying separator type.
+                <b>addParam_Namespace()</b> adds a parameter to the future file paths for an application
+                or algorithm.
+                <b>removeParam_Namespace()</b> removes a parameter from the future file paths for an
+                application or algorithm.
+            </p>
+            <h3>Modifying the Paths of Existing Files</h3>
+            <p>
+                The 
+            </p>
+            <h3>Interface</h3>
+            <p>
+                
+            </p>
+            <h2>Loading Experiments</h2>
             <p>
 
+            </p>
+            <h2>Running a Set of Experiments</h2>
+            <p>
+
+            </p>
+            <h2>Generating an Input File</h2>
+            <p>
+                
             </p>
         </div>
     </body>
